@@ -1,6 +1,8 @@
 use crate::utils::rgb;
 
 mod utils;
+mod camera;
+mod rays;
 
 fn main() {
     let r1 = rgb::RGB::default();
