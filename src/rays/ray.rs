@@ -4,8 +4,8 @@ use crate::utils::vector::{Point, Vector};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Ray{
-    origin: Point,
-    direction: Vector,
+    pub origin: Point,
+    pub direction: Vector,
 }
 
 const EPSILON: f32 = 1e-3;

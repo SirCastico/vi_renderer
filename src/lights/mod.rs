@@ -24,7 +24,7 @@ impl Light{
     pub fn point_radiance(&self, point: &Point) -> RGB{
         match self{
             Self::Ambient(ambient) => {
-                todo!()
+                return ambient.color;
             }
             Self::Point(point) => {
                 todo!()

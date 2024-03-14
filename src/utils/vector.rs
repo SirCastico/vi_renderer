@@ -210,6 +210,16 @@ impl Point {
     }
 }
 
+impl Into<Vector> for Point{
+    fn into(self) -> Vector {
+        Vector {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
+}
+
 impl ops::Add<Point> for Point {
     type Output = Point;
 
