@@ -23,7 +23,7 @@ impl Mesh{
 }
 
 impl Intersectable for Mesh{
-    fn intersect(&self, ray: Ray) -> Option<IntersectionData> {
+    fn intersect(&self, ray: &Ray) -> Option<IntersectionData> {
         todo!()
     }
 }

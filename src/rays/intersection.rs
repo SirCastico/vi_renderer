@@ -6,4 +6,5 @@ pub struct IntersectionData{
     pub point: Point,
     pub geo_normal: Vector,
     pub wo: Vector,
+    pub depth: f32,
 }

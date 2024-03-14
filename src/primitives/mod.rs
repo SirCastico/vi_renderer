@@ -6,6 +6,6 @@ pub mod material_data;
 
 
 pub trait Intersectable{
-    fn intersect(&self, ray: Ray) -> Option<IntersectionData>;
+    fn intersect(&self, ray: &Ray) -> Option<IntersectionData>;
 }
 

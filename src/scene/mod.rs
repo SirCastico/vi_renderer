@@ -22,7 +22,25 @@ impl<T: Intersectable> Scene<T>{
         todo!();
     }
 
-    pub fn trace(&self, ray: Ray) -> Option<TraceData>{
+    pub fn trace(&self, ray: &Ray) -> Option<TraceData>{
+        if self.prims.len() == 0 {
+            return None;
+        }
+        let mut curr_trace_opt: Option<TraceData> = None;
+        for (prim, ind) in self.prims.iter() {
+            if let Some(isect) = prim.intersect(ray){
+                if let Some(curr_trace) = curr_trace_opt {
+
+                } else {
+                    curr_trace_opt = Some(TraceData{
+                        isect,
+                        mat_data: self.phong_brdfs[*ind as usize],
+                    });
+                }
+            } else {
+
+            }
+        }
         todo!()
     }
 
