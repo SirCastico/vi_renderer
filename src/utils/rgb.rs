@@ -22,6 +22,13 @@ impl RGB{
     }
 }
 
+impl ops::AddAssign<RGB> for RGB{
+    fn add_assign(&mut self, rhs: RGB) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+    }
+}
 
 impl ops::Add<RGB> for RGB{
     type Output = RGB;

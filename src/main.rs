@@ -1,12 +1,36 @@
-use crate::utils::rgb;
+use std::path::Path;
+
+use images::image_rgb::ImageRGB;
+use primitives::{mesh::Mesh, Intersectable};
+use scene::Scene;
+use shaders::{ambient_shader::AmbientShader, Shader};
 
 mod utils;
 mod camera;
 mod rays;
+mod images;
+mod shaders;
+mod scene;
+mod lights;
+mod primitives;
+mod render;
+
 
 fn main() {
-    let r1 = rgb::RGB::default();
-    let r2 = rgb::RGB::new(3.,2.,1.0);
-    println!("{:?}", r1+r2);
+
+    let mut scene = Scene::<Mesh>::new();
+    scene.load_obj_file(Path::new(""));
+    // scene.add_light();
+
+    let shader = AmbientShader::default();
+
+    let mut image = ImageRGB::new(640, 480);
+
+    render::standard_render(&scene, &shader, &mut image);
+    
+    //let ppm = image_to_ppm(image);
+    //ppm.write_out();
+
+
 }
 

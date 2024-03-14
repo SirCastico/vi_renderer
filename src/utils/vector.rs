@@ -140,6 +140,7 @@ impl ops::Mul<f32> for Vector{
     }
 }
 
+
 impl ops::Mul<Vector> for f32{
     type Output = Vector;
 

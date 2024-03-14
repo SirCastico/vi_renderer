@@ -1,9 +1,4 @@
 
+pub mod intersection;
+pub mod ray;
 
-pub struct Ray{
-
-}
-
-impl Ray{
-    
-}
