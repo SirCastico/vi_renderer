@@ -6,7 +6,7 @@ pub struct Perspective {
     pub eye: Point,
     pub at: Point,
     pub up: Vector,
-    pub extent: Extent2D,
+    pub window_extent: Extent2D,
     pub fov_width: f32,
     pub fov_height: f32,
     pub c2w: [[f32; 3]; 3]
@@ -18,7 +18,7 @@ impl Perspective{
             eye,
             at,
             up,
-            extent,
+            window_extent: extent,
             fov_width,
             fov_height,
             ..Default::default()
@@ -31,6 +31,6 @@ impl Camera for Perspective{
         todo!()
     }
     fn get_resolution(&self) -> Extent2D{
-        self.extent
+        self.window_extent
     }
 }
