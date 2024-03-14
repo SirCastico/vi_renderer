@@ -1,5 +1,7 @@
 use crate::utils::rgb::RGB;
 
+use super::image_ppm::ImagePPM;
+
 #[derive(Debug, Clone, Default)]
 pub struct ImageRGB{
     pub data: Box<[RGB]>,
@@ -30,5 +32,12 @@ impl ImageRGB{
         }
         self.data[(y*self.width+x) as usize] += *rgb;
         true
+    }
+}
+
+
+impl Into<ImagePPM> for ImageRGB{
+    fn into(self) -> ImagePPM {
+        todo!()
     }
 }

@@ -1,13 +1,35 @@
 use crate::utils::{vector::Point, rgb::RGB};
 
-pub mod ambient_light;
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct AmbientLight{
+    pub color: RGB
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PointLight{
+    pub color: RGB,
+    pub position: Point,
+}
 
 
+#[derive(Debug, Clone, Copy)]
+pub enum Light{
+    Ambient(AmbientLight),
+    Point(PointLight)
+}
 
-pub trait Light{
-    fn l() -> RGB;
-    fn l_point(p: &Point) -> RGB;
-    fn sample_l();
-    fn sample_l_pdf();
-    fn pdf();
+
+impl Light{
+    pub fn point_radiance(&self, point: &Point) -> RGB{
+        match self{
+            Self::Ambient(ambient) => {
+                todo!()
+            }
+            Self::Point(point) => {
+                todo!()
+            }
+
+        }
+    }
 }

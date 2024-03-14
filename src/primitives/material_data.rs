@@ -1,10 +1,11 @@
 use crate::utils::rgb::RGB;
 
 
+#[derive(Debug, Clone, Copy, Default)]
 pub struct MaterialData{
-    pub ka: RGB,
-    pub kd: RGB,
-    pub ks: RGB,
+    pub ka: RGB, // ambient
+    pub kd: RGB, // diffuse 
+    pub ks: RGB, // specular 
     pub kt: RGB,
     pub ns: f32,
 }

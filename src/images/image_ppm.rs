@@ -14,7 +14,7 @@ pub struct ImagePPM{
 }
 
 impl ImagePPM{
-    fn new(width: u32, height: u32) -> Self{
+    pub fn new(width: u32, height: u32) -> Self{
         Self {
             data: Vec::with_capacity((width*height) as usize).into(),
             width,
@@ -22,7 +22,7 @@ impl ImagePPM{
         }
     }
 
-    fn save(path: &Path){
+    pub fn save(path: &Path){
         todo!();
     }
 }

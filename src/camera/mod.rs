@@ -1,4 +1,4 @@
-use crate::{rays::Ray, utils::Extent2D};
+use crate::{rays::ray::Ray, utils::Extent2D};
 
 pub mod perspective;
 

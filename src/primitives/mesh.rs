@@ -1,4 +1,4 @@
-use crate::utils::{vector::{Point, Vector}, aabb::AABB};
+use crate::{utils::{vector::{Point, Vector}, aabb::AABB}, rays::{ray::Ray, intersection::IntersectionData}};
 
 use super::Intersectable;
 
@@ -23,8 +23,8 @@ impl Mesh{
 }
 
 impl Intersectable for Mesh{
-    fn intersect() -> bool {
-        todo!();
+    fn intersect(&self, ray: Ray) -> Option<IntersectionData> {
+        todo!()
     }
 }
 

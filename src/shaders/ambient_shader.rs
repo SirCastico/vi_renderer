@@ -1,4 +1,4 @@
-use crate::{utils::rgb::RGB, rays::intersection::IntersectionData};
+use crate::{utils::rgb::RGB, rays::intersection::IntersectionData, primitives::{material_data::MaterialData, Intersectable}, scene::{Scene, TraceData}};
 
 use super::Shader;
 
@@ -11,7 +11,8 @@ pub struct AmbientShader{
 
 
 impl Shader for AmbientShader{
-    fn shade(isect: Option<IntersectionData>) -> RGB {
-        RGB::default()
+    fn shade<T: Intersectable>(&self, scene: &Scene<T>, isect: &Option<TraceData>, mat_data: &MaterialData) -> RGB {
+        todo!()
     }
 }
+
