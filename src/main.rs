@@ -34,7 +34,7 @@ fn main() {
     let camera = Perspective::new(eye, at, up, Extent2D{width, height}, fov_w_rad, fov_h_rad);
     let amb_light = Light::Ambient(AmbientLight{color: RGB{r:0.9,g:0.9,b:0.9}});
     let mut scene = Scene::new();
-    scene.load_obj_file(Path::new(""));
+    scene.load_obj_file(Path::new("./models/cornell_box.obj"));
     scene.add_light(amb_light);
 
     let shader = AmbientShader::default();
