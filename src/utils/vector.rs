@@ -178,6 +178,18 @@ impl ops::Div<f32> for Vector{
     }
 }
 
+impl ops::Div<Vector> for f32{
+    type Output = Vector;
+
+    fn div(self, v: Vector) -> Vector {
+        Vector {
+            x: self / v.x,
+            y: self / v.y,
+            z: self / v.z,
+        }
+    }
+}
+
 #[derive(Debug, Copy, Clone, Default)]
 pub struct Point {
     pub x: f32,

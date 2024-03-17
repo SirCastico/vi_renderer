@@ -2,9 +2,8 @@ use crate::{primitives::Intersectable, shaders::Shader, scene::Scene, images::im
 
 
 
-pub fn standard_render<I, S, C>(camera: &C,scene: &Scene<I>, shader: &S, image: &mut ImageRGB)
-    where I: Intersectable,
-          S: Shader,
+pub fn standard_render<S, C>(camera: &C,scene: &Scene, shader: &S, image: &mut ImageRGB)
+    where S: Shader,
           C: Camera
 {
 

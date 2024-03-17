@@ -1,11 +1,19 @@
-use crate::utils::vector::{Point};
+use crate::{utils::vector::Point, rays::ray::Ray};
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct AABB {
     pub max: Point,
     pub min: Point
 }
 
+impl Default for AABB{
+    fn default() -> Self {
+        Self {
+            max: Point { x: f32::MIN, y: f32::MIN, z: f32::MIN },
+            min: Point { x: f32::MAX, y: f32::MAX, z: f32::MAX },
+        }
+    }
+}
 
 impl AABB {
     pub fn update(&mut self, p: &Point){
@@ -35,5 +43,51 @@ impl AABB {
      * or https://doi.org/10.1007/978-1-4842-7185-8_2
      *
      */
-    //pub fn intersect(ray: &Ray) -> bool{}
+
+    // based on https://tavianator.com/2011/ray_box.html
+    // relies on ieee 754 division by zero
+    pub fn intersect(&self, ray: &Ray) -> bool{
+        let tx1 = (self.min.x - ray.origin.x)*ray.direction_inv.x;
+        let tx2 = (self.max.x - ray.origin.x)*ray.direction_inv.x;
+
+        let mut tmin = tx1.min(tx2);
+        let mut tmax = tx1.max(tx2);
+
+        let ty1 = (self.min.y - ray.origin.y)*ray.direction_inv.y;
+        let ty2 = (self.max.y - ray.origin.y)*ray.direction_inv.y;
+
+        tmin = tmin.max(ty1.min(ty2));
+        tmax = tmax.min(ty1.max(ty2));
+
+        let tz1 = (self.min.z - ray.origin.z)*ray.direction_inv.z;
+        let tz2 = (self.max.z - ray.origin.z)*ray.direction_inv.z;
+
+        tmin = tmin.max(tz1.min(tz2));
+        tmax = tmax.min(tz1.max(tz2));
+
+        return tmax >= tmin;
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::{utils::vector::{Point, Vector}, rays::ray::Ray};
+
+    use super::AABB;
+
+    #[test]
+    fn aabb_intersection(){
+        let aabb = AABB {
+            max: Point::new(1.0, 1.0, 1.0),  
+            min: Point::new(-1.0, -1.0, -1.0),  
+        };
+        let aabb_far = AABB {
+            max: Point::new(5.0, 5.0, 5.0),  
+            min: Point::new(4.0, 4.0, 4.0),  
+        };
+        let ray = Ray::new(Point::new(5.0,0.0,0.0), Vector::new(-1.0, 0.0, 0.0));
+
+        assert!(aabb.intersect(&ray));
+        assert!(!aabb_far.intersect(&ray));
+    }
 }

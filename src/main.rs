@@ -3,9 +3,8 @@ use std::path::Path;
 use camera::perspective::Perspective;
 use images::image_rgb::ImageRGB;
 use lights::{Light, AmbientLight};
-use primitives::{mesh::Mesh, Intersectable};
 use scene::Scene;
-use shaders::{ambient_shader::AmbientShader, Shader};
+use shaders::ambient_shader::AmbientShader;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
 mod utils;
@@ -34,7 +33,7 @@ fn main() {
 
     let camera = Perspective::new(eye, at, up, Extent2D{width, height}, fov_w_rad, fov_h_rad);
     let amb_light = Light::Ambient(AmbientLight{color: RGB{r:0.9,g:0.9,b:0.9}});
-    let mut scene = Scene::<Mesh>::new();
+    let mut scene = Scene::new();
     scene.load_obj_file(Path::new(""));
     scene.add_light(amb_light);
 

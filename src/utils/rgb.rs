@@ -77,3 +77,13 @@ impl ops::Div<f32> for RGB{
         }
     }
 }
+
+impl From<[f32; 3]> for RGB{
+    fn from(value: [f32; 3]) -> Self {
+        Self {
+            r: value[0],
+            g: value[1],
+            b: value[2],
+        }
+    }
+}
