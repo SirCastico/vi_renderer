@@ -23,8 +23,8 @@ fn main() {
     let height = 640;
     let width = 480;
 
-    let eye = Point::new(0.0, 0.0, 0.0);
-    let at = Point::new(0.0,0.0,1.0);
+    let eye = Point::new(300.0, 300.0, 300.0);
+    let at = Point::new(1.0, 0.0, 0.0);
     let up = Vector::new(0.0, 1.0, 0.0);
     let fov_w = 60f32;
     let fov_h = fov_w * height as f32/width as f32;

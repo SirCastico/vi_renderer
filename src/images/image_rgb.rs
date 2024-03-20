@@ -14,7 +14,7 @@ pub struct ImageRGB{
 impl ImageRGB{
     pub fn new(width: u32, height: u32) -> Self{
         let mut v = Vec::new();
-        v.resize((width*height) as usize, RGB::default());
+        v.resize((width*height) as usize, RGB::new(0.0, 0.0, 0.0));
         Self {
             data: v.into_boxed_slice(),
             width,
@@ -44,9 +44,9 @@ impl From<ImageRGB> for ImagePPM {
     fn from(value: ImageRGB) -> Self {
         let mut ppm = ImagePPM::new(value.width, value.height);
         for (i, pixel) in value.data.iter().enumerate() {
-            let r = (pixel.r * 255.0).min(1.0) as u8;
-            let g = (pixel.g * 255.0).min(1.0) as u8;
-            let b = (pixel.b * 255.0).min(1.0) as u8;
+            let r = (pixel.r * 255.0).min(255.0) as u8;
+            let g = (pixel.g * 255.0).min(255.0) as u8;
+            let b = (pixel.b * 255.0).min(255.0) as u8;
             ppm.data[i].rgb = [r, g, b];
         }
         ppm
