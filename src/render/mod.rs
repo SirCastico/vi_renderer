@@ -22,16 +22,10 @@ where
             };
 
             // Trace the primary ray through the scene to find intersections
-            let intersection = scene.trace(&primary_ray);
-
-            let intr_op = intersection;
+            let tdata_opt = scene.trace(&primary_ray);
 
             // Shade the intersection using the provided shader, with depth=0
-            let color = if let Some(intersection) = &intersection {
-                shader.shade(scene, &intr_op, &intersection.mat_data)
-            } else {
-                RGB::new(0.0, 0.0, 0.0) //O que é suposto acontecer nesta situação exatamente?
-            };
+            let color = shader.shade(scene, &tdata_opt);
 
             // Write the resulting color to the image frame buffer
             image.set(x, y, &color); 

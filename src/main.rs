@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use camera::perspective::Perspective;
-use images::image_rgb::ImageRGB;
+use images::{image_rgb::ImageRGB, image_ppm::ImagePPM};
 use lights::{Light, AmbientLight};
 use scene::Scene;
 use shaders::ambient_shader::AmbientShader;
@@ -37,15 +37,16 @@ fn main() {
     scene.load_obj_file(Path::new("./models/cornell_box.obj"));
     scene.add_light(amb_light);
 
-    let shader = AmbientShader::default();
+    let shader = AmbientShader{background: RGB { r: 1.0, g: 0.0, b: 0.0 }};
 
     let mut image = ImageRGB::new(640, 480);
 
     render::standard_render(&camera, &scene, &shader, &mut image);
     
-    //let ppm = image_to_ppm(image);
-    //ppm.write_out();
+    let ppm: ImagePPM = image.into();
+    ppm.save(Path::new("./out.ppm")).expect("failed to output ppm");
 
+    println!("outputed ppm");
 
 }
 

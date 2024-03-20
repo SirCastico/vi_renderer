@@ -10,16 +10,17 @@ pub struct AmbientShader{
 
 
 impl Shader for AmbientShader {
-    fn shade(&self, scene: &Scene, isect: &Option<TraceData>, mat_data: &MaterialData) -> RGB {
+    fn shade(&self, scene: &Scene, tdata_opt: &Option<TraceData>) -> RGB {
         let mut color = RGB::new(0.0, 0.0, 0.0);
 
         // if no intersection, return background
-        if isect.is_none() {
+        if tdata_opt.is_none() {
             return self.background;
         }
+        let tdata = tdata_opt.unwrap();
 
         // verify whether the intersected object has an ambient component
-        let ka = mat_data.ka;
+        let ka = tdata.mat_data.ka;
         if ka.is_zero() {
             return color;
         }

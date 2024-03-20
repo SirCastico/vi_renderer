@@ -6,7 +6,7 @@ use super::Intersectable;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Face{
     pub positions: [Point; 3],
-    pub normals: [Vector; 3],
+    //pub normals: [Vector; 3],
 }
 
 #[derive(Debug, Clone, Default)]
@@ -52,7 +52,6 @@ impl Mesh{
 fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
     // Based on https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 
-    let mut isect: Option<IntersectionData> = None;
     let e1: Vector = (face.positions[1] - face.positions[0]).into();
     let e2: Vector = (face.positions[2] - face.positions[0]).into();
 
@@ -107,13 +106,13 @@ impl Intersectable for Mesh{
                 let tb = self.positions[self.pos_inds[i*3+1] as usize];
                 let tc = self.positions[self.pos_inds[i*3+2] as usize];
 
-                let na = self.normals[self.norm_inds[i*3] as usize];
-                let nb = self.normals[self.norm_inds[i*3+1] as usize];
-                let nc = self.normals[self.norm_inds[i*3+2] as usize];
+                //let na = self.normals[self.norm_inds[i*3] as usize];
+                //let nb = self.normals[self.norm_inds[i*3+1] as usize];
+                //let nc = self.normals[self.norm_inds[i*3+2] as usize];
 
                 let face = Face{
                     positions: [ta,tb,tc],
-                    normals: [na,nb,nc],
+                    //normals: [na,nb,nc],
                 };
 
                 if let Some(face_isect) = triangle_intersect(ray, &face) {

@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::utils::rgb::RGB;
 
 use super::image_ppm::ImagePPM;
@@ -11,8 +13,10 @@ pub struct ImageRGB{
 
 impl ImageRGB{
     pub fn new(width: u32, height: u32) -> Self{
+        let mut v = Vec::new();
+        v.resize((width*height) as usize, RGB::default());
         Self {
-            data: Vec::with_capacity((width*height) as usize).into(),
+            data: v.into_boxed_slice(),
             width,
             height
         }
@@ -36,13 +40,13 @@ impl ImageRGB{
 }
 
 
-impl Into<ImagePPM> for ImageRGB {
-    fn into(self) -> ImagePPM {
-        let mut ppm = ImagePPM::new(self.width, self.height);
-        for (i, pixel) in self.data.iter().enumerate() {
-            let r= pixel.r.round() as u8;
-            let g = pixel.g.round() as u8;
-            let b = pixel.b.round() as u8;
+impl From<ImageRGB> for ImagePPM {
+    fn from(value: ImageRGB) -> Self {
+        let mut ppm = ImagePPM::new(value.width, value.height);
+        for (i, pixel) in value.data.iter().enumerate() {
+            let r = (pixel.r * 255.0).min(1.0) as u8;
+            let g = (pixel.g * 255.0).min(1.0) as u8;
+            let b = (pixel.b * 255.0).min(1.0) as u8;
             ppm.data[i].rgb = [r, g, b];
         }
         ppm

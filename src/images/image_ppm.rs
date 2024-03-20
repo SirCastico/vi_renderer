@@ -17,8 +17,10 @@ pub struct ImagePPM{
 
 impl ImagePPM{
     pub fn new(width: u32, height: u32) -> Self{
+        let mut v = Vec::new();
+        v.resize((width*height) as usize, PPMPixel::default());
         Self {
-            data: Vec::with_capacity((width*height) as usize).into(),
+            data: v.into_boxed_slice(),
             width,
             height
         }
