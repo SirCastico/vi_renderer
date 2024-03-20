@@ -36,8 +36,15 @@ impl ImageRGB{
 }
 
 
-impl Into<ImagePPM> for ImageRGB{
+impl Into<ImagePPM> for ImageRGB {
     fn into(self) -> ImagePPM {
-        todo!()
+        let mut ppm = ImagePPM::new(self.width, self.height);
+        for (i, pixel) in self.data.iter().enumerate() {
+            let r= pixel.r.round() as u8;
+            let g = pixel.g.round() as u8;
+            let b = pixel.b.round() as u8;
+            ppm.data[i].rgb = [r, g, b];
+        }
+        ppm
     }
 }

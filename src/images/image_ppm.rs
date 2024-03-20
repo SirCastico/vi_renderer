@@ -1,4 +1,6 @@
 use std::path::Path;
+use std::fs::File;
+use std::io::Write;
 
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -22,8 +24,15 @@ impl ImagePPM{
         }
     }
 
-    pub fn save(path: &Path){
-        todo!();
+    pub fn save(&self, path: &Path) -> std::io::Result<()> {
+        let mut file = File::create(path)?;
+        write!(file, "P6\n{} {}\n255\n", self.width, self.height)?;
+
+        for pixel in self.data.iter() {
+            file.write_all(&pixel.rgb)?;
+        }
+
+        Ok(())
     }
 }
 

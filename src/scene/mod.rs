@@ -9,12 +9,11 @@ pub struct TraceData{
     pub mat_data: MaterialData,
 }
 
-
 #[derive(Debug, Clone, Default)]
-pub struct Scene{
-    prims: Vec<(Mesh,u16)>, 
-    materials_data: Vec<MaterialData>,
-    lights: Vec<Light>
+pub struct Scene {
+    pub prims: Vec<(Mesh, u16)>, 
+    pub materials_data: Vec<MaterialData>,
+    pub lights: Vec<Light>,
 }
 
 impl Scene{
