@@ -1,6 +1,7 @@
 use crate::{utils::rgb::RGB, primitives::{material_data::MaterialData, Intersectable}, scene::{Scene, TraceData}};
 
 pub mod ambient_shader;
+pub mod light_shader;
 
 
 pub trait Shader{

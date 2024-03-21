@@ -27,7 +27,7 @@ impl Light{
                 return ambient.color;
             }
             Self::Point(point) => {
-                todo!()
+                return point.color;
             }
 
         }
