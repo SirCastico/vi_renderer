@@ -33,7 +33,7 @@ impl Scene{
         for (prim, ind) in self.prims.iter() {
             if let Some(isect) = prim.intersect(ray){
                 if let Some(curr_trace) = curr_trace_opt {
-                    if curr_trace.isect.depth < isect.depth {
+                    if curr_trace.isect.depth > isect.depth {
                         curr_trace_opt = Some(TraceData{
                             isect,
                             mat_data: self.materials_data[*ind as usize],

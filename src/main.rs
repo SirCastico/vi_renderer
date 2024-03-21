@@ -21,10 +21,10 @@ mod render;
 fn main() {
 
     let height = 640;
-    let width = 480;
+    let width = 640;
 
-    let eye = Point::new(300.0, 300.0, 300.0);
-    let at = Point::new(1.0, 0.0, 0.0);
+    let eye = Point::new(300.0, 150.0, -800.0);
+    let at = Point::new(300.0, 150.0, 300.0);
     let up = Vector::new(0.0, 1.0, 0.0);
     let fov_w = 60f32;
     let fov_h = fov_w * height as f32/width as f32;
@@ -35,9 +35,10 @@ fn main() {
     let amb_light = Light::Ambient(AmbientLight{color: RGB{r:0.9,g:0.9,b:0.9}});
     let mut scene = Scene::new();
     scene.load_obj_file(Path::new("./models/cornell_box.obj"));
+    //Light::Point(PointLight{color:RGB{r:1.0,g:1.0,b:1.0},position:Point::new(213.0, 548.0, 332.0)})
     scene.add_light(amb_light);
 
-    let shader = AmbientShader{background: RGB { r: 1.0, g: 0.0, b: 0.0 }};
+    let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(640, 480);
 
