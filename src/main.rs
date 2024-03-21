@@ -41,8 +41,8 @@ fn main() {
 
     let point_light = Light::Point(
         PointLight{
-            color:RGB{r:1.0,g:1.0,b:1.0},
-            position:Point::new(213.0, 500.0, 332.0)
+            color:RGB{r:0.9,g:0.9,b:0.9},
+            position:Point::new(273.0, 548.0, 279.5)
         });
 
     scene.add_light(amb_light);

@@ -32,7 +32,7 @@ impl Shader for LightShader {
                 let ray: Ray = Ray::new(tdata.isect.point, ray_dir);
                 let light_tdata_opt = scene.trace(&ray);
                 
-                if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth > light_dist {
+                if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
                      color += tdata.mat_data.kd * light.point_radiance(&tdata.isect.point);
                 }
             }
