@@ -29,8 +29,8 @@ impl Shader for LightShader {
                 let light_dist = ray_dir.norm();
                 ray_dir.normalize();
 
-                let shadow_bias = 0.0;
-                let ray_o = tdata.isect.point + tdata.isect.geo_normal.face_forward(tdata.isect.wo) * shadow_bias;
+                let shadow_bias = 0.000001;
+                let ray_o = tdata.isect.point + tdata.isect.geo_normal.face_forward(-1.0*tdata.isect.wo) * shadow_bias;
                 let ray: Ray = Ray::new(ray_o, ray_dir);
                 let light_tdata_opt = scene.trace(&ray);
                 

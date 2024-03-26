@@ -27,8 +27,8 @@ fn main() {
     let eye = Point::new(280.0, 275.0, -830.0);
     let at = Point::new(280.0, 265.0, 280.0);
     let up = Vector::new(0.0, 1.0, 0.0);
-    let fov_w = 90f32;
-    let fov_h = fov_w * height as f32/width as f32;
+    let fov_w = 60f32;
+    let fov_h = fov_w * width as f32/height as f32;
     let fov_w_rad = fov_w*3.14/180.0;
     let fov_h_rad = fov_h*3.14/180.0;
 
@@ -41,13 +41,13 @@ fn main() {
     let point_light = Light::Point(
         PointLight{
             color:RGB{r:0.9,g:0.9,b:0.9},
-            position:Point::new(273.0, 548.0, 279.5)
+            position:Point::new(273.0, 505.0, 279.5)
         });
 
     scene.add_light(amb_light);
     scene.add_light(point_light);
 
-    let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
+    let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(640, 480);
 
