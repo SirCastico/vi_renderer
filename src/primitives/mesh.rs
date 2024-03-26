@@ -84,7 +84,7 @@ fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
         return Some(IntersectionData { 
             point: ipoint, 
             geo_normal: e1.cross(e2), 
-            wo: ray.direction, // TODO: not sure what wo means
+            wo: -1.0*ray.direction, // TODO: not sure what wo means
             depth: t
         });
     } else {

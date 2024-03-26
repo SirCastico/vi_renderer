@@ -5,7 +5,8 @@ use super::Shader;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct LightShader{
-    pub background: RGB
+    pub background: RGB,
+    pub shadow_bias: f32
 }
 
 
@@ -29,13 +30,15 @@ impl Shader for LightShader {
                 let light_dist = ray_dir.norm();
                 ray_dir.normalize();
 
-                let shadow_bias = 0.000001;
-                let ray_o = tdata.isect.point + tdata.isect.geo_normal.face_forward(-1.0*tdata.isect.wo) * shadow_bias;
+                let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
+                g_normal.normalize();
+
+                let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
                 let ray: Ray = Ray::new(ray_o, ray_dir);
                 let light_tdata_opt = scene.trace(&ray);
                 
                 if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
-                     color += tdata.mat_data.kd * light.point_radiance(&tdata.isect.point);
+                     color += tdata.mat_data.kd * light.point_radiance(&tdata.isect.point) * 0f32.max(g_normal.dot(ray_dir));
                 }
             }
         }
