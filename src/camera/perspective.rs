@@ -9,16 +9,19 @@ pub struct Perspective {
     window_extent: Extent2D,
     fov_width: f32,
     fov_height: f32,
-    c2w: [[f32; 3]; 3]
+    c2w: [[f32; 3]; 4]
 }
 
 impl Perspective{
     pub fn new(eye: Point, at: Point, up: Vector, extent: Extent2D, fov_width: f32, fov_height: f32) -> Self{
-        let mut f: Vector = (at-eye).into();
+        let mut f: Vector = (eye-at).into();
         f.normalize();
 
-        let mut r = f.cross(up);
+        let mut r = up.cross(f);
         r.normalize();
+
+        let mut up = f.cross(r);
+        up.normalize();
 
         Self{
             eye,
@@ -31,6 +34,7 @@ impl Perspective{
                 [r.x, r.y, r.z],
                 [up.x, up.y, up.z],
                 [f.x, f.y, f.z],
+                [eye.x,eye.y,eye.z],
             ]
         }
     }
@@ -41,23 +45,25 @@ impl Camera for Perspective{
         if x>=self.window_extent.width || y>=self.window_extent.height {
             return None;
         }
-        let xs = (2.0*(x as f32 + 0.5)/self.window_extent.width as f32)-1.0;
-        let ys = 2.0*((self.window_extent.height-y-1) as f32 + 0.5)/self.window_extent.height as f32 - 1.0;
 
-        let xc = xs * (self.fov_width/2.0).tan();
+        let aspect_ratio = self.window_extent.width as f32 / self.window_extent.height as f32;
+        let xs = (2.0*(x as f32 + 0.5)/self.window_extent.width as f32)-1.0;
+        let ys = 1.0 - 2.0*(y as f32 + 0.5)/self.window_extent.height as f32;
+
+        let xc = xs * aspect_ratio * (self.fov_width/2.0).tan();
         let yc = ys * (self.fov_height/2.0).tan();
 
         let mut ray = Ray::default();
         ray.origin = self.eye;
-        let mut dir: [f32; 3] = [0.0,0.0,0.0];
-        let coords = [xc,yc,1.0];
+        let mut dir: [f32; 4] = [0.0,0.0,0.0,0.0];
+        let coords = [xc,yc,-1.0];
 
         for i in 0..self.c2w.len() {
             for j in 0..self.c2w[i].len() {
                 dir[i] += self.c2w[i][j] * coords[j];
             }
         }
-        ray.direction = Vector::new(dir[0], dir[1], dir[2]);
+        ray.direction = Vector::new(dir[0]/dir[3], dir[1]/dir[3], dir[2]/dir[3]);
 
         Some(ray)
     }

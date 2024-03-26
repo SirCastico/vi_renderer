@@ -102,6 +102,8 @@ impl Scene{
                 .chunks_exact(3)
                 .map(|a|{Vector::new(a[0], a[1], a[2])})
                 .collect();
+
+            //println!("Mesh name: {}\n n_verts:{}", obj_model.name, positions.len());
             
             let mesh = Mesh::new(positions, normals, obj_pos_inds, obj_normal_inds);
             let mat_ind: u16 = if let Some(m_id) = obj_mesh.material_id{

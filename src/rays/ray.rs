@@ -9,7 +9,8 @@ pub struct Ray{
     pub direction_inv: Vector,
 }
 
-pub const EPSILON: f32 = 1e-3;
+//pub const EPSILON: f32 = 1e-3;
+pub const EPSILON: f32 = f32::EPSILON;
 
 impl Ray{
     pub fn new(origin: Point, mut direction: Vector) -> Self{

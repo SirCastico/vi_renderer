@@ -38,6 +38,7 @@ impl Mesh{
             face_aabb.update(tc);
             face_aabbs.push(face_aabb);
         }
+        //println!("n_faces:{}", face_aabbs.len());
         Self {
             positions,
             normals,

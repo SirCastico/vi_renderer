@@ -153,17 +153,17 @@ impl ops::Mul<Vector> for f32{
     }
 }
 
-impl ops::Mul<Vector> for f64{
-    type Output = Vector;
-
-    fn mul(self, v: Vector) -> Vector {
-        Vector {
-            x: (self * v.x as f64) as f32,
-            y: (self * v.y as f64) as f32,
-            z: (self * v.z as f64) as f32,
-        }
-    }
-}
+//impl ops::Mul<Vector> for f64{
+//    type Output = Vector;
+//
+//    fn mul(self, v: Vector) -> Vector {
+//        Vector {
+//            x: (self * v.x as f64) as f32,
+//            y: (self * v.y as f64) as f32,
+//            z: (self * v.z as f64) as f32,
+//        }
+//    }
+//}
 
 
 impl ops::Div<f32> for Vector{
