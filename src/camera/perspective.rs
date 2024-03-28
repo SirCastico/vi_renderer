@@ -9,7 +9,7 @@ pub struct Perspective {
     window_extent: Extent2D,
     fov_width: f32,
     fov_height: f32,
-    c2w: [[f32; 3]; 4]
+    c2w: [[f32; 3]; 3]
 }
 
 impl Perspective{
@@ -34,7 +34,6 @@ impl Perspective{
                 [r.x, r.y, r.z],
                 [up.x, up.y, up.z],
                 [f.x, f.y, f.z],
-                [eye.x,eye.y,eye.z],
             ]
         }
     }
@@ -53,9 +52,7 @@ impl Camera for Perspective{
         let xc = xs * aspect_ratio * (self.fov_width/2.0).tan();
         let yc = ys * (self.fov_height/2.0).tan();
 
-        let mut ray = Ray::default();
-        ray.origin = self.eye;
-        let mut dir: [f32; 4] = [0.0,0.0,0.0,0.0];
+        let mut dir: [f32; 3] = [0.0,0.0,0.0];
         let coords = [xc,yc,-1.0];
 
         for i in 0..self.c2w.len() {
@@ -63,7 +60,9 @@ impl Camera for Perspective{
                 dir[i] += self.c2w[i][j] * coords[j];
             }
         }
-        ray.direction = Vector::new(dir[0]/dir[3], dir[1]/dir[3], dir[2]/dir[3]);
+        let direction = Vector::new(dir[0], dir[1], dir[2]);
+
+        let ray = Ray::new(self.eye, direction);
 
         Some(ray)
     }

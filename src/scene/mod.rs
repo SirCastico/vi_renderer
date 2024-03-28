@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, fs, io::Write};
 
 use crate::{primitives::{Intersectable, material_data::MaterialData, mesh::Mesh}, lights::Light, rays::{intersection::IntersectionData, ray::Ray}, utils::{rgb::RGB, vector::{Point, Vector}}};
 
@@ -86,6 +86,8 @@ impl Scene{
             }
             self.materials_data.push(mat);
         }
+        let mut file = fs::File::create("verts.txt").unwrap();
+
         for obj_model in obj_models.iter_mut(){
             let obj_mesh = &mut obj_model.mesh;
             let obj_positions = std::mem::take(&mut obj_mesh.positions);
@@ -104,7 +106,19 @@ impl Scene{
                 .collect();
 
             //println!("Mesh name: {}\n n_verts:{}", obj_model.name, positions.len());
-            
+
+            file.write_all(obj_model.name.as_bytes()).unwrap();
+            file.write_all("\n".as_bytes()).unwrap();
+
+            for inds in obj_pos_inds.chunks_exact(3){
+                let p0 = positions[inds[0] as usize];
+                let p1 = positions[inds[1] as usize];
+                let p2 = positions[inds[2] as usize];
+
+                write!(file, "{:?},{:?},{:?}\n", p0, p1, p2).unwrap();
+            }
+            file.write_all("\n".as_bytes()).unwrap();
+
             let mesh = Mesh::new(positions, normals, obj_pos_inds, obj_normal_inds);
             let mat_ind: u16 = if let Some(m_id) = obj_mesh.material_id{
                 (m_id + mats_start_ind).try_into().unwrap()

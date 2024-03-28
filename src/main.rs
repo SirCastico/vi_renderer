@@ -21,10 +21,10 @@ mod render;
 
 fn main() {
 
-    let height = 640;
-    let width = 640;
+    let height = 800;
+    let width = 800;
 
-    let eye = Point::new(280.0, 375.0, -830.0);
+    let eye = Point::new(280.0, 375.0, -800.0);
     let at = Point::new(280.0, 265.0, 280.0);
     let up = Vector::new(0.0, 1.0, 0.0);
     let fov_w = 60f32;
@@ -47,9 +47,10 @@ fn main() {
     scene.add_light(amb_light);
     scene.add_light(point_light);
 
-    let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001};
+    //let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001};
+    let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
-    let mut image = ImageRGB::new(640, 480);
+    let mut image = ImageRGB::new(height, width);
 
     render::standard_render(&camera, &scene, &shader, &mut image);
     

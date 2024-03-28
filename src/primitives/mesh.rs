@@ -84,7 +84,7 @@ fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
         return Some(IntersectionData { 
             point: ipoint, 
             geo_normal: e1.cross(e2), 
-            wo: -1.0*ray.direction, // TODO: not sure what wo means
+            wo: -1.0*ray.direction, 
             depth: t
         });
     } else {
@@ -103,6 +103,7 @@ impl Intersectable for Mesh{
         
         for (i,bb) in self.face_aabbs.iter().enumerate(){
             if bb.intersect(ray) {
+
                 let ta = self.positions[self.pos_inds[i*3] as usize];
                 let tb = self.positions[self.pos_inds[i*3+1] as usize];
                 let tc = self.positions[self.pos_inds[i*3+2] as usize];
@@ -130,6 +131,39 @@ impl Intersectable for Mesh{
 }
 
 
+#[cfg(test)]
+mod tests{
+    use crate::{utils::vector::{Point, Vector}, rays::ray::Ray};
+
+    use super::{Face, triangle_intersect};
+
+
+    #[test]
+    fn triangle_intersect_test(){
+        let face = Face{
+            positions: [
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(2.0, 0.0, 0.0),
+                Point::new(0.0, 2.0, 0.0),
+            ]
+        };
+        let face_ord = Face{
+            positions: [
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(0.0, 2.0, 0.0),
+                Point::new(2.0, 0.0, 0.0),
+            ]
+        };
+        let ray = Ray::new(
+            Point::new(1.0, 1.0, 1.0), 
+            Vector::new(0.0, 0.0, -1.0),
+        );
+
+        assert!(triangle_intersect(&ray, &face).is_some());
+        assert!(triangle_intersect(&ray, &face_ord).is_some());
+
+    }
+}
 
 
 
