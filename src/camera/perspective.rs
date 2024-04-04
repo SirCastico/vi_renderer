@@ -40,16 +40,16 @@ impl Perspective{
 }
 
 impl Camera for Perspective{
-    fn generate_ray(&self, x: u32, y: u32, cam_jitter: Option<f32>) -> Option<Ray>{
+    fn generate_ray(&self, x: u32, y: u32, _cam_jitter: Option<f32>) -> Option<Ray>{
         if x>=self.window_extent.width || y>=self.window_extent.height {
             return None;
         }
 
-        let aspect_ratio = self.window_extent.width as f32 / self.window_extent.height as f32;
         let xs = (2.0*(x as f32 + 0.5)/self.window_extent.width as f32)-1.0;
-        let ys = 1.0 - 2.0*(y as f32 + 0.5)/self.window_extent.height as f32;
+        let ys = 2.0*((self.window_extent.height - y - 1) as f32 + 0.5)
+            /self.window_extent.height as f32 - 1.0;
 
-        let xc = xs * aspect_ratio * (self.fov_width/2.0).tan();
+        let xc = xs * (self.fov_width/2.0).tan();
         let yc = ys * (self.fov_height/2.0).tan();
 
         let mut dir: [f32; 3] = [0.0,0.0,0.0];

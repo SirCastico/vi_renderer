@@ -102,7 +102,7 @@ impl Intersectable for Mesh{
         }
         
         for (i,bb) in self.face_aabbs.iter().enumerate(){
-            if bb.intersect(ray) {
+            //if bb.intersect(ray) {
 
                 let ta = self.positions[self.pos_inds[i*3] as usize];
                 let tb = self.positions[self.pos_inds[i*3+1] as usize];
@@ -123,7 +123,7 @@ impl Intersectable for Mesh{
                         isect = Some(face_isect);
                     }
                 }
-            }
+            //}
         }
 
         isect
