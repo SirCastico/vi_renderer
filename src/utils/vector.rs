@@ -190,7 +190,7 @@ impl ops::Div<Vector> for f32{
     }
 }
 
-#[derive(Debug, Copy, Clone, Default)]
+#[derive(Debug, Copy, Clone, Default, PartialEq)]
 pub struct Point {
     pub x: f32,
     pub y: f32,

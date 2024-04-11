@@ -1,6 +1,6 @@
 use crate::{utils::vector::Point, rays::ray::Ray};
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct AABB {
     pub max: Point,
     pub min: Point
@@ -19,17 +19,20 @@ impl AABB {
     pub fn update(&mut self, p: &Point){
         if p.x < self.min.x {
             self.min.x = p.x;
-        } else if p.x > self.max.x {
+        } 
+        if p.x > self.max.x {
             self.max.x = p.x;
         }
         if p.y < self.min.y {
             self.min.y = p.y;
-        } else if p.y > self.max.y {
+        } 
+        if p.y > self.max.y {
             self.max.y = p.y;
         }
         if p.z < self.min.z {
             self.min.z = p.z;
-        } else if p.z > self.max.z {
+        } 
+        if p.z > self.max.z {
             self.max.z = p.z;
         }
     }
@@ -76,11 +79,31 @@ mod tests{
     use super::AABB;
 
     #[test]
+    fn aabb_update(){
+        let a = Point::new(1.0,1.0,1.0);
+        let b = Point::new(-1.0, -1.0, -1.0);
+        let mut aabb_u = AABB::default();
+        aabb_u.update(&a);
+        aabb_u.update(&b);
+
+        println!("{:?}", aabb_u);
+
+        assert!(aabb_u.max==a);
+        assert!(aabb_u.min==b);
+    }
+
+    #[test]
     fn aabb_intersection(){
+        let a = Point::new(1.0,1.0,1.0);
+        let b = Point::new(-1.0, -1.0, -1.0);
         let aabb = AABB {
-            max: Point::new(1.0, 1.0, 1.0),  
-            min: Point::new(-1.0, -1.0, -1.0),  
+            max: a,  
+            min: b,  
         };
+        let mut aabb_u = AABB::default();
+        aabb_u.update(&a);
+        aabb_u.update(&b);
+
         let aabb_far = AABB {
             max: Point::new(5.0, 5.0, 5.0),  
             min: Point::new(4.0, 4.0, 4.0),  
@@ -88,6 +111,7 @@ mod tests{
         let ray = Ray::new(Point::new(5.0,0.0,0.0), Vector::new(-1.0, 0.0, 0.0));
 
         assert!(aabb.intersect(&ray));
+        assert!(aabb_u.intersect(&ray));
         assert!(!aabb_far.intersect(&ray));
     }
 }
