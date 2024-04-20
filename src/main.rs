@@ -47,7 +47,7 @@ fn main() {
     scene.add_light(amb_light);
     scene.add_light(point_light);
 
-    let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001};
+    let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001, reflection_depth: 3};
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);

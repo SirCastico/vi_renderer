@@ -4,8 +4,8 @@ use crate::{rays::ray::Ray, camera::Camera, utils::{vector::{Point, Vector}, Ext
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Perspective {
     eye: Point,
-    at: Point,
-    up: Vector,
+    //at: Point,
+    //up: Vector,
     window_extent: Extent2D,
     fov_width: f32,
     fov_height: f32,
@@ -25,8 +25,8 @@ impl Perspective{
 
         Self{
             eye,
-            at,
-            up,
+            //at,
+            //up,
             window_extent: extent,
             fov_width,
             fov_height,

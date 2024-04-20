@@ -11,11 +11,11 @@ pub struct Face{
 
 #[derive(Debug, Clone, Default)]
 pub struct Mesh{
-    pub positions: Vec<Point>,
-    pub pos_inds: Vec<u32>,
-    pub normals: Vec<Vector>,
-    pub norm_inds: Vec<u32>,
-    pub face_aabbs: Vec<AABB>,
+    pub positions: Box<[Point]>,
+    pub pos_inds: Box<[u32]>,
+    pub normals: Box<[Vector]>,
+    pub norm_inds: Box<[u32]>,
+    pub face_aabbs: Box<[AABB]>,
     pub aabb: AABB,
 }
 
@@ -27,6 +27,7 @@ impl Mesh{
             mesh_aabb.update(pos);
         }
         let mut face_aabbs: Vec<AABB> = Vec::with_capacity(pos_inds.len()/3);
+
         for face_inds in pos_inds.chunks_exact(3){
             let ta = &positions[face_inds[0] as usize];
             let tb = &positions[face_inds[1] as usize];
@@ -40,12 +41,12 @@ impl Mesh{
         }
         //println!("n_faces:{}", face_aabbs.len());
         Self {
-            positions,
-            normals,
-            pos_inds,
-            norm_inds,
+            positions: positions.into_boxed_slice(),
+            normals: normals.into_boxed_slice(),
+            pos_inds: pos_inds.into_boxed_slice(),
+            norm_inds: norm_inds.into_boxed_slice(),
             aabb: mesh_aabb,
-            face_aabbs
+            face_aabbs: face_aabbs.into_boxed_slice()
         }
     }    
 }
@@ -127,6 +128,10 @@ impl Intersectable for Mesh{
         }
 
         isect
+    }
+
+    fn visibility(&self, ray: &Ray, depth: f32) -> bool {
+        todo!()
     }
 }
 
