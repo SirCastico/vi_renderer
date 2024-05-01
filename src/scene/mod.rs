@@ -50,6 +50,10 @@ impl Scene{
         curr_trace_opt
     }
 
+    pub fn visibility(&self, ray: &Ray, depth: f32) -> bool{
+        todo!()
+    }
+
     pub fn load_obj_file(&mut self, path: &Path) {
         let (mut obj_models, obj_materials) = tobj::load_obj(path, &tobj::GPU_LOAD_OPTIONS).expect("failed to load OBJ file");
         let obj_materials = obj_materials.expect("failed to load MTL file");

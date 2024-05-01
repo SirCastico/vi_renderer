@@ -7,5 +7,7 @@ pub mod material_data;
 
 pub trait Intersectable{
     fn intersect(&self, ray: &Ray) -> Option<IntersectionData>;
+
+    fn visibility(&self, ray: &Ray, depth: f32) -> bool;
 }
 
