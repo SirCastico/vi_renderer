@@ -1,5 +1,6 @@
 use crate::utils::{vector::Point, rgb::RGB};
 
+pub mod area_light;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AmbientLight{
@@ -16,7 +17,7 @@ pub struct PointLight{
 #[derive(Debug, Clone, Copy)]
 pub enum Light{
     Ambient(AmbientLight),
-    Point(PointLight)
+    Point(PointLight),
 }
 
 
@@ -29,7 +30,6 @@ impl Light{
             Self::Point(point) => {
                 return point.color;
             }
-
         }
     }
 }

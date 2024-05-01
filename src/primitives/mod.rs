@@ -3,6 +3,7 @@ use crate::rays::{ray::Ray, intersection::IntersectionData};
 
 pub mod mesh;
 pub mod material_data;
+pub mod triangle;
 
 
 pub trait Intersectable{
