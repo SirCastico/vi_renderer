@@ -52,3 +52,11 @@ impl From<ImageRGB> for ImagePPM {
         ppm
     }
 }
+
+impl std::ops::DivAssign<f32> for RGB {
+    fn div_assign(&mut self, other: f32) {
+        self.r /= other;
+        self.g /= other;
+        self.b /= other;
+    }
+}

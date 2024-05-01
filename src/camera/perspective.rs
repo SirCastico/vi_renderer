@@ -40,13 +40,18 @@ impl Perspective{
 }
 
 impl Camera for Perspective{
-    fn generate_ray(&self, x: u32, y: u32, _cam_jitter: Option<f32>) -> Option<Ray>{
+    fn generate_ray(&self, x: u32, y: u32, _cam_jitter: Option<[f32; 2]>) -> Option<Ray>{
         if x>=self.window_extent.width || y>=self.window_extent.height {
             return None;
         }
 
-        let xs = (2.0*(x as f32 + 0.5)/self.window_extent.width as f32)-1.0;
-        let ys = 2.0*((self.window_extent.height - y - 1) as f32 + 0.5)
+        let (jitter_x, jitter_y) = match _cam_jitter {
+            Some(jitter) => (jitter[0], jitter[1]),
+            None => (0.5, 0.5),
+        };
+
+        let xs = (2.0*(x as f32 + jitter_x)/self.window_extent.width as f32)-1.0;
+        let ys = 2.0*((self.window_extent.height - y - 1) as f32 + jitter_y)
             /self.window_extent.height as f32 - 1.0;
 
         let xc = xs * (self.fov_width/2.0).tan();
