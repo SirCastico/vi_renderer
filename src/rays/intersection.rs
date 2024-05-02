@@ -8,9 +8,3 @@ pub struct IntersectionData {
     pub depth: f32,
 }
 
-impl IntersectionData {
-    //Não sei como é suposto ser esta função
-    pub fn is_light(&self) -> bool {
-        self.point != Point::default()
-    }
-}

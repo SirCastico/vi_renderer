@@ -82,9 +82,11 @@ fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
 
     if t > ray::EPSILON{
         let ipoint = ray.origin + ray.direction * t;
+        let mut gn = e1.cross(e2);
+        gn.normalize();
         return Some(IntersectionData { 
             point: ipoint, 
-            geo_normal: e1.cross(e2), 
+            geo_normal: gn, 
             wo: -1.0*ray.direction, 
             depth: t
         });
