@@ -4,13 +4,13 @@ use super::Shader;
 
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct LightShader{
+pub struct WhittedShader{
     pub background: RGB,
     pub shadow_bias: f32,
     pub reflection_depth: u16
 }
 
-impl LightShader{
+impl WhittedShader{
     fn shade_impl(&self, scene: &Scene, tdata_opt: &Option<TraceData>, depth: u16) -> RGB {
         let mut color = RGB::new(0.0, 0.0, 0.0);
 
@@ -21,7 +21,6 @@ impl LightShader{
         let tdata = tdata_opt.unwrap();
 
         // specular
-
         if !tdata.mat_data.ks.is_zero() && depth>0{
             let cos = tdata.isect.geo_normal.dot(tdata.isect.wo);
             let ray_dir = 2.0 * cos * tdata.isect.geo_normal - tdata.isect.wo;
@@ -67,7 +66,7 @@ impl LightShader{
     }
 }
 
-impl Shader for LightShader {
+impl Shader for WhittedShader {
     fn shade(&self, scene: &Scene, tdata_opt: &Option<TraceData>) -> RGB {
         self.shade_impl(scene, tdata_opt, self.reflection_depth)
     }

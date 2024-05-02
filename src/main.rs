@@ -6,7 +6,7 @@ use lights::{Light, AmbientLight};
 use scene::Scene;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::PointLight, shaders::{light_shader::LightShader, ambient_shader::AmbientShader}};
+use crate::{lights::PointLight, shaders::{whitted_shader::WhittedShader, ambient_shader::AmbientShader}};
 
 mod utils;
 mod camera;
@@ -34,7 +34,7 @@ fn main() {
 
     let camera = Perspective::new(eye, at, up, Extent2D{width, height}, fov_w_rad, fov_h_rad);
     let mut scene = Scene::new();
-    scene.load_obj_file(Path::new("./models/cornell_box.obj"));
+    scene.load_obj_file(Path::new("./models/cornell_box_VI.obj"));
 
     let amb_light = Light::Ambient(AmbientLight{color: RGB{r:0.3,g:0.3,b:0.3}});
 
@@ -47,7 +47,7 @@ fn main() {
     scene.add_light(amb_light);
     scene.add_light(point_light);
 
-    let shader = LightShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001, reflection_depth: 3};
+    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001, reflection_depth: 3};
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);
