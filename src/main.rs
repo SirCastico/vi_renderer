@@ -59,7 +59,7 @@ fn main() {
     //scene.add_light(point_light);
     scene.add_light(a_light);
 
-    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005, reflection_depth: 3};
+    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);

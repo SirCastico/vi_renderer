@@ -55,7 +55,7 @@ impl Scene{
                             trace_opt = Some(TraceData { 
                                 isect: curr_isect, 
                                 mat_data: MaterialData { 
-                                    le: Some(al.intensity),
+                                    le: Some(al.power),
                                     ..Default::default()
                                 }
                             });
@@ -64,7 +64,7 @@ impl Scene{
                         trace_opt = Some(TraceData { 
                             isect: curr_isect, 
                             mat_data: MaterialData { 
-                                le: Some(al.intensity),
+                                le: Some(al.power),
                                 ..Default::default()
                             }
                         });

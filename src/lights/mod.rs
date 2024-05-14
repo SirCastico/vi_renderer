@@ -1,7 +1,6 @@
 use crate::{primitives::Intersectable, rays::{intersection::IntersectionData, ray::Ray}, utils::{rgb::RGB, vector::{Point, Vector}}};
 use crate::primitives::triangle::Triangle;
 
-pub mod area_light;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AmbientLight{
