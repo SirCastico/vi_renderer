@@ -33,7 +33,7 @@ impl PathTracerShader{
         let (rx, ry) = tdata.isect.geo_normal.coordinate_system();
 
         let diffuse = Ray::new(
-            tdata.isect.point, 
+            tdata.isect.point,
             d_around_z.rotate(rx, ry, tdata.isect.geo_normal),
         );
 
@@ -62,12 +62,14 @@ impl PathTracerShader{
         let sp_ray = Ray::new(origin, ray_dir);
 
         let sp_tdata_opt = scene.trace(&sp_ray);
+        let rcolor: RGB;
         if depth>0{
-            return self.shade_impl(scene, &sp_tdata_opt, depth-1);
+            rcolor = self.shade_impl(scene, &sp_tdata_opt, depth-1);
         }
         else {
-            return self.shade_impl(scene, &sp_tdata_opt, depth);
+            rcolor = self.shade_impl(scene, &sp_tdata_opt, depth);
         }
+        return rcolor * tdata.mat_data.ks;
     }
 
     fn shade_impl(&self, scene: &Scene, tdata_opt: &Option<TraceData>, depth: u16) -> RGB {
