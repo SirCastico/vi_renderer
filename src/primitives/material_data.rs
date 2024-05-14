@@ -7,5 +7,6 @@ pub struct MaterialData{
     pub kd: RGB, // diffuse 
     pub ks: RGB, // specular 
     pub kt: RGB,
+    pub le: Option<RGB>,
     pub ns: f32,
 }

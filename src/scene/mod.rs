@@ -29,25 +29,53 @@ impl Scene{
         if self.prims.len() == 0 {
             return None;
         }
-        let mut curr_trace_opt: Option<TraceData> = None;
+        let mut trace_opt: Option<TraceData> = None;
         for (prim, ind) in self.prims.iter() {
-            if let Some(isect) = prim.intersect(ray){
-                if let Some(curr_trace) = curr_trace_opt {
-                    if curr_trace.isect.depth > isect.depth {
-                        curr_trace_opt = Some(TraceData{
-                            isect,
+            if let Some(curr_isect) = prim.intersect(ray){
+                if let Some(trace) = trace_opt {
+                    if trace.isect.depth > curr_isect.depth {
+                        trace_opt = Some(TraceData{
+                            isect: curr_isect,
                             mat_data: self.materials_data[*ind as usize],
                         });
                     }
                 } else {
-                    curr_trace_opt = Some(TraceData{
-                        isect,
+                    trace_opt = Some(TraceData{
+                        isect: curr_isect,
                         mat_data: self.materials_data[*ind as usize],
                     });
                 }
             }
         }
-        curr_trace_opt
+        for light in self.lights.iter(){
+            if let Light::Area(al) = light{
+                if let Some(curr_isect) = al.intersect(ray){
+                    if let Some(trace) = trace_opt{
+                        if trace.isect.depth > curr_isect.depth{
+                            trace_opt = Some(TraceData { 
+                                isect: curr_isect, 
+                                mat_data: MaterialData { 
+                                    le: Some(al.intensity),
+                                    ..Default::default()
+                                }
+                            });
+                        }
+                    } else {
+                        trace_opt = Some(TraceData { 
+                            isect: curr_isect, 
+                            mat_data: MaterialData { 
+                                le: Some(al.intensity),
+                                ..Default::default()
+                            }
+                        });
+
+                    }
+                    
+                }
+            }
+        }
+
+        trace_opt
     }
 
     pub fn visibility(&self, ray: &Ray, depth: f32) -> bool{

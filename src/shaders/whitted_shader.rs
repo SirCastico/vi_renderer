@@ -21,6 +21,9 @@ impl WhittedShader{
             return self.background;
         }
         let tdata = tdata_opt.unwrap();
+        if let Some(le) = tdata.mat_data.le{
+            return le;
+        }
 
         // specular
         if !tdata.mat_data.ks.is_zero() && depth>0{
@@ -76,15 +79,19 @@ impl WhittedShader{
                     l_dir.normalize();
 
                     let cosl = l_dir.dot(tdata.isect.geo_normal.face_forward(l_dir));
-                    let cosl_la = l_dir.dot(area_light.gem.normal);
+                    let cosl_la = l_dir.dot(area_light.tri.normal);
 
                     if cosl>0. && cosl_la<=0.0 {
+                        let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
+                        g_normal.normalize();
+
                         let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
-                        let ray: Ray = Ray::new(ray_o, ray_dir);
+                        let ray: Ray = Ray::new(ray_o, l_dir);
                         let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
                         
-                        if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
-                             color += tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
+                        if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.shadow_bias
+                            || light_tdata_opt.unwrap().mat_data.le.is_some() {
+                             color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                         }
                     }
                 }

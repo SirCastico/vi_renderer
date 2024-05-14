@@ -1,13 +1,8 @@
 use crate::{utils::{vector::{Point, Vector}, aabb::AABB}, rays::{ray::{Ray, self}, intersection::IntersectionData}};
 
-use super::Intersectable;
+use super::{triangle::{triangle_intersect, Face}, Intersectable};
 
 
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Face{
-    pub positions: [Point; 3],
-    //pub normals: [Vector; 3],
-}
 
 #[derive(Debug, Clone, Default)]
 pub struct Mesh{
@@ -51,49 +46,6 @@ impl Mesh{
     }    
 }
 
-fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
-    // Based on https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-
-    let e1: Vector = (face.positions[1] - face.positions[0]).into();
-    let e2: Vector = (face.positions[2] - face.positions[0]).into();
-
-    let ray_cross_e2 = ray.direction.cross(e2);
-    let det = e1.dot(ray_cross_e2);
-
-    if det > -ray::EPSILON && det < ray::EPSILON{
-        return None; // ray is parallel
-    }
-
-    let inv_det = 1.0 / det;
-    let s: Vector = (ray.origin - face.positions[0]).into();
-    let u = inv_det * s.dot(ray_cross_e2);
-
-    if u<0.0 || u>1.0{
-        return None;
-    }
-
-    let s_cross_e1 = s.cross(e1);
-    let v = inv_det * ray.direction.dot(s_cross_e1);
-    if v<0.0 || u+v>1.0 {
-        return None;
-    }
-
-    let t = inv_det * e2.dot(s_cross_e1);
-
-    if t > ray::EPSILON{
-        let ipoint = ray.origin + ray.direction * t;
-        let mut gn = e1.cross(e2);
-        gn.normalize();
-        return Some(IntersectionData { 
-            point: ipoint, 
-            geo_normal: gn, 
-            wo: -1.0*ray.direction, 
-            depth: t
-        });
-    } else {
-        return None;
-    }
-}
 
 impl Intersectable for Mesh{
     fn intersect(&self, ray: &Ray) -> Option<IntersectionData> {
@@ -140,9 +92,7 @@ impl Intersectable for Mesh{
 
 #[cfg(test)]
 mod tests{
-    use crate::{utils::vector::{Point, Vector}, rays::ray::Ray};
-
-    use super::{Face, triangle_intersect};
+    use crate::{primitives::triangle::{triangle_intersect, Face}, rays::ray::Ray, utils::vector::{Point, Vector}};
 
 
     #[test]

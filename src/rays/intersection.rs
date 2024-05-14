@@ -1,4 +1,4 @@
-use crate::utils::vector::{Point, Vector};
+use crate::utils::{rgb::RGB, vector::{Point, Vector}};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct IntersectionData {

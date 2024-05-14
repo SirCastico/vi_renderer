@@ -1,4 +1,4 @@
-use crate::utils::{vector::{Vector,Point}, rgb::RGB};
+use crate::{primitives::Intersectable, rays::{intersection::IntersectionData, ray::Ray}, utils::{rgb::RGB, vector::{Point, Vector}}};
 use crate::primitives::triangle::Triangle;
 
 pub mod area_light;
@@ -18,19 +18,18 @@ pub struct PointLight{
 pub struct AreaLight{
     pub intensity: RGB,
     pub power: RGB,
-    pub gem: Triangle,
+    pub tri: Triangle,
     pub pdf: f32,
 }
 
 impl AreaLight {
-    pub fn new(power: RGB, v1: Point, v2: Point, v3: Point, normal: Vector) -> Self {
-        let gem = Triangle::new(v1, v2, v3, normal);
-        let pdf = 1.0 / gem.area();
+    pub fn new(power: RGB, tri: Triangle) -> Self {
+        let pdf = 1.0 / tri.area();
         let intensity = power * pdf;
         Self {
             intensity,
             power,
-            gem,
+            tri,
             pdf,
         }
     } 
@@ -41,10 +40,20 @@ impl AreaLight {
         let beta = (1.0 - r[1]) * sqrt_r0;
         let gamma = r[1] * sqrt_r0;
         let mut p = Point::default();
-        p.x = alpha * self.gem.v1.x + beta * self.gem.v2.x + gamma * self.gem.v3.x;
-        p.y = alpha * self.gem.v1.y + beta * self.gem.v2.y + gamma * self.gem.v3.y;
-        p.z = alpha * self.gem.v1.z + beta * self.gem.v2.z + gamma * self.gem.v3.z;
+        p.x = alpha * self.tri.v1.x + beta * self.tri.v2.x + gamma * self.tri.v3.x;
+        p.y = alpha * self.tri.v1.y + beta * self.tri.v2.y + gamma * self.tri.v3.y;
+        p.z = alpha * self.tri.v1.z + beta * self.tri.v2.z + gamma * self.tri.v3.z;
         return (self.intensity/self.pdf, p)
+    }
+}
+
+impl Intersectable for AreaLight{
+    fn intersect(&self, ray: &Ray) -> Option<IntersectionData> {
+        return self.tri.intersect(ray);
+    }
+    
+    fn visibility(&self, ray: &Ray, depth: f32) -> bool {
+        todo!()
     }
 }
 

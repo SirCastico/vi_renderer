@@ -6,7 +6,7 @@ use lights::{Light, AmbientLight};
 use scene::Scene;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::PointLight, shaders::{whitted_shader::WhittedShader, ambient_shader::AmbientShader}};
+use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, whitted_shader::WhittedShader}};
 
 mod utils;
 mod camera;
@@ -44,10 +44,22 @@ fn main() {
             position:Point::new(273.0, 495.0, 279.5)
         });
 
+    let a_light = Light::Area(
+        AreaLight::new(
+            RGB::new(0.8, 0.8, 0.8), 
+            Triangle::new(
+                Point::new(253.0, 525.0, 279.0), 
+                Point::new(303.0, 525.0, 279.0), 
+                Point::new(273.0, 525.0, 330.0), 
+                Vector::new(0.0, -1.0, 0.0),
+            )
+        )
+    );
     scene.add_light(amb_light);
-    scene.add_light(point_light);
+    //scene.add_light(point_light);
+    scene.add_light(a_light);
 
-    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.001, reflection_depth: 3};
+    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005, reflection_depth: 3};
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);
