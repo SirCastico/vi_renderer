@@ -93,7 +93,7 @@ fn main() {
 
     let mut image = ImageRGB::new(height, width);
 
-    render::standard_render(&camera, &scene, &shader, &mut image, 64);
+    render::standard_render(&camera, &scene, &shader, &mut image, 32);
     
     let ppm: ImagePPM = image.into();
     ppm.save(Path::new("./out.ppm")).expect("failed to output ppm");

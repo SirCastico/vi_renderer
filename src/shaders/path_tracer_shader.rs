@@ -25,8 +25,8 @@ impl PathTracerShader{
 
         let cos_theta = rnd[1].sqrt();
         let d_around_z = Vector::new(
-            (2.0*f32::consts::PI).cos()*(1.0-rnd[1]).sqrt(), 
-            (2.0*f32::consts::PI).sin()*(1.0-rnd[1]).sqrt(), 
+            (2.0*f32::consts::PI*rnd[0]).cos()*(1.0-rnd[1]).sqrt(), 
+            (2.0*f32::consts::PI*rnd[0]).sin()*(1.0-rnd[1]).sqrt(), 
             cos_theta, 
         );
         let pdf = cos_theta / f32::consts::PI;
