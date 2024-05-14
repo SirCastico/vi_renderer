@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use crate::utils::rgb::RGB;
 
 use super::image_ppm::ImagePPM;

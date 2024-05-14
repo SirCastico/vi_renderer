@@ -1,4 +1,4 @@
-use crate::{utils::rgb::RGB, primitives::{material_data::MaterialData, Intersectable}, scene::{Scene, TraceData}};
+use crate::{utils::rgb::RGB, scene::{Scene, TraceData}};
 
 pub mod ambient_shader;
 pub mod whitted_shader;
