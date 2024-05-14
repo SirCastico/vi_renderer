@@ -6,7 +6,7 @@ use lights::{Light, AmbientLight};
 use scene::Scene;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, whitted_shader::WhittedShader}};
+use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, distributed_shader::DistributedShader, whitted_shader::WhittedShader}};
 
 mod utils;
 mod camera;
@@ -55,11 +55,36 @@ fn main() {
             )
         )
     );
+    let b_light1 = Light::Area(
+        AreaLight::new(
+            RGB::new(0.8, 0.8, 0.8), 
+            Triangle::new(
+                Point::new(343.0, 548.0, 227.0), 
+                Point::new(343.0, 548.0, 332.0), 
+                Point::new(213.0, 548.0, 332.0), 
+                Vector::new(0.0, -1.0, 0.0),
+            )
+        )
+    );
+    let b_light2 = Light::Area(
+        AreaLight::new(
+            RGB::new(0.8, 0.8, 0.8), 
+            Triangle::new(
+                Point::new(213.0, 548.0, 332.0), 
+                Point::new(213.0, 548.0, 227.0), 
+                Point::new(343.0, 548.0, 227.0), 
+                Vector::new(0.0, -1.0, 0.0),
+            )
+        )
+    );
+
     scene.add_light(amb_light);
     //scene.add_light(point_light);
-    scene.add_light(a_light);
+    //scene.add_light(a_light);
+    scene.add_light(b_light1);scene.add_light(b_light2);
 
-    let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
+    let shader = DistributedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
+    //let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);
