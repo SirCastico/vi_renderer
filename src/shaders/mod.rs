@@ -3,6 +3,7 @@ use crate::{utils::rgb::RGB, primitives::{material_data::MaterialData, Intersect
 pub mod ambient_shader;
 pub mod whitted_shader;
 pub mod distributed_shader;
+pub mod path_tracer_shader;
 
 
 pub trait Shader{

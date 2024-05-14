@@ -85,13 +85,16 @@ impl Vector {
         }
     }
 
-    pub fn coordinate_system(&self, v2: &mut Vector, v3: &mut Vector) {
+    pub fn coordinate_system(&self) -> (Vector, Vector){
+        let v2: Vector;
+        let v3: Vector;
         if self.x.abs() > self.y.abs() {
-            *v2 = Vector::new(-self.z, 0.0, self.x) / (self.x * self.x + self.z * self.z).sqrt();
+            v2 = Vector::new(-self.z, 0.0, self.x) / (self.x * self.x + self.z * self.z).sqrt();
         } else {
-            *v2 = Vector::new(0.0, self.z, -self.y) / (self.y * self.y + self.z * self.z).sqrt();
+            v2 = Vector::new(0.0, self.z, -self.y) / (self.y * self.y + self.z * self.z).sqrt();
         }
-        *v3 = self.cross(*v2);
+        v3 = self.cross(v2);
+        return (v2,v3);
     }
 
     pub fn rotate(&self, rx: Vector, ry: Vector, rz: Vector) -> Vector {

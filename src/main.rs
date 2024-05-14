@@ -6,7 +6,11 @@ use lights::{Light, AmbientLight};
 use scene::Scene;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
+<<<<<<< HEAD
 use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, distributed_shader::DistributedShader, whitted_shader::WhittedShader}};
+=======
+use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, path_tracer_shader::PathTracerShader, whitted_shader::WhittedShader}};
+>>>>>>> fcc4eba (path tracer)
 
 mod utils;
 mod camera;
@@ -78,18 +82,22 @@ fn main() {
         )
     );
 
-    scene.add_light(amb_light);
+    //scene.add_light(amb_light);
     //scene.add_light(point_light);
     //scene.add_light(a_light);
     scene.add_light(b_light1);scene.add_light(b_light2);
 
-    let shader = DistributedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
-    //let shader = WhittedShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }, shadow_bias: 0.005f32, reflection_depth: 3};
+    let shader = PathTracerShader{
+        background: RGB { r: 0.05, g: 0.05, b: 0.55 }, 
+        shadow_bias: 0.005f32, 
+        reflection_depth: 3,
+        reflection_prob: 0.5,
+    };
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
 
     let mut image = ImageRGB::new(height, width);
 
-    render::standard_render(&camera, &scene, &shader, &mut image, 16);
+    render::standard_render(&camera, &scene, &shader, &mut image, 64);
     
     let ppm: ImagePPM = image.into();
     ppm.save(Path::new("./out.ppm")).expect("failed to output ppm");
