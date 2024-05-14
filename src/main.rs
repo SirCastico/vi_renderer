@@ -6,11 +6,7 @@ use lights::{Light, AmbientLight};
 use scene::Scene;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-<<<<<<< HEAD
-use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, distributed_shader::DistributedShader, whitted_shader::WhittedShader}};
-=======
 use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, path_tracer_shader::PathTracerShader, whitted_shader::WhittedShader}};
->>>>>>> fcc4eba (path tracer)
 
 mod utils;
 mod camera;
