@@ -10,7 +10,7 @@ use super::Shader;
 
 pub struct PathTracerShader{
     pub background: RGB,
-    pub shadow_bias: f32,
+    pub collision_bias: f32,
     pub reflection_prob: f32,
     pub reflection_depth: u16
 }
@@ -33,7 +33,7 @@ impl PathTracerShader{
         let (rx, ry) = tdata.isect.geo_normal.coordinate_system();
 
         let diffuse = Ray::new(
-            tdata.isect.point,
+            tdata.isect.point + tdata.isect.geo_normal * self.collision_bias,
             d_around_z.rotate(rx, ry, tdata.isect.geo_normal),
         );
 
@@ -58,7 +58,7 @@ impl PathTracerShader{
         let cos = gn.dot(tdata.isect.wo);
         let ray_dir = 2.0 * cos * gn - tdata.isect.wo;
 
-        let origin = tdata.isect.point + gn * self.shadow_bias;
+        let origin = tdata.isect.point + gn * self.collision_bias;
         let sp_ray = Ray::new(origin, ray_dir);
 
         let sp_tdata_opt = scene.trace(&sp_ray);
@@ -95,7 +95,7 @@ impl PathTracerShader{
                     return color;
                 }
 
-                let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
+                let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                 let ray: Ray = Ray::new(ray_o, ray_dir);
                 let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
                 
@@ -123,11 +123,11 @@ impl PathTracerShader{
                     let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                     g_normal.normalize();
 
-                    let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
+                    let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                     let ray: Ray = Ray::new(ray_o, l_dir);
                     let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
                     
-                    if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.shadow_bias
+                    if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.collision_bias
                         || light_tdata_opt.unwrap().mat_data.le.is_some() {
                             color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                     }
@@ -160,7 +160,7 @@ impl PathTracerShader{
                         continue;
                     }
 
-                    let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
+                    let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                     let ray: Ray = Ray::new(ray_o, ray_dir);
                     let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
                     
@@ -188,11 +188,11 @@ impl PathTracerShader{
                         let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                         g_normal.normalize();
 
-                        let ray_o = tdata.isect.point + g_normal * self.shadow_bias;
+                        let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                         let ray: Ray = Ray::new(ray_o, l_dir);
                         let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
                         
-                        if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.shadow_bias
+                        if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.collision_bias
                             || light_tdata_opt.unwrap().mat_data.le.is_some() {
                                 color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                         }

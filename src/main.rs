@@ -57,7 +57,7 @@ fn main() {
     );
     let b_light1 = Light::Area(
         AreaLight::new(
-            RGB::new(0.8, 0.8, 0.8), 
+            RGB::new(0.6, 0.6, 0.6), 
             Triangle::new(
                 Point::new(343.0, 548.0, 227.0), 
                 Point::new(343.0, 548.0, 332.0), 
@@ -68,7 +68,7 @@ fn main() {
     );
     let b_light2 = Light::Area(
         AreaLight::new(
-            RGB::new(0.8, 0.8, 0.8), 
+            RGB::new(0.6, 0.6, 0.6), 
             Triangle::new(
                 Point::new(213.0, 548.0, 332.0), 
                 Point::new(213.0, 548.0, 227.0), 
@@ -80,14 +80,14 @@ fn main() {
 
     //scene.add_light(amb_light);
     //scene.add_light(point_light);
-    scene.add_light(a_light);
+    //scene.add_light(a_light);
     scene.add_light(b_light1);
     scene.add_light(b_light2);
 
     let shader = PathTracerShader{
         background: RGB { r: 0.05, g: 0.05, b: 0.55 }, 
-        shadow_bias: 0.005f32, 
-        reflection_depth: 3,
+        collision_bias: 0.001f32, 
+        reflection_depth: 2,
         reflection_prob: 0.5,
     };
     //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
