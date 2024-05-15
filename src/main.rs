@@ -46,11 +46,11 @@ fn main() {
 
     let a_light = Light::Area(
         AreaLight::new(
-            RGB::new(0.8, 0.8, 0.8), 
+            RGB::new(0.4, 0.4, 0.4), 
             Triangle::new(
-                Point::new(253.0, 525.0, 279.0), 
-                Point::new(303.0, 525.0, 279.0), 
-                Point::new(273.0, 525.0, 330.0), 
+                Point::new(100.0, 525.0, 100.0), 
+                Point::new(130.0, 525.0, 100.0), 
+                Point::new(100.0, 525.0, 130.0), 
                 Vector::new(0.0, -1.0, 0.0),
             )
         )
@@ -80,8 +80,9 @@ fn main() {
 
     //scene.add_light(amb_light);
     //scene.add_light(point_light);
-    //scene.add_light(a_light);
-    scene.add_light(b_light1);scene.add_light(b_light2);
+    scene.add_light(a_light);
+    scene.add_light(b_light1);
+    scene.add_light(b_light2);
 
     let shader = PathTracerShader{
         background: RGB { r: 0.05, g: 0.05, b: 0.55 }, 
@@ -93,7 +94,7 @@ fn main() {
 
     let mut image = ImageRGB::new(height, width);
 
-    render::standard_render(&camera, &scene, &shader, &mut image, 32);
+    render::standard_render(&camera, &scene, &shader, &mut image, 64);
     
     let ppm: ImagePPM = image.into();
     ppm.save(Path::new("./out.ppm")).expect("failed to output ppm");
