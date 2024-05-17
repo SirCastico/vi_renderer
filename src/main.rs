@@ -1,13 +1,16 @@
-use std::path::Path;
+use std::{path::Path, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, Condvar}, thread, time::Instant};
 
-use camera::perspective::Perspective;
+use camera::{perspective::Perspective, Camera};
 use images::{image_rgb::ImageRGB, image_ppm::ImagePPM};
 use lights::{Light, AmbientLight};
+use minifb::{Key, Window, WindowOptions};
 use scene::Scene;
+use shaders::Shader;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, shaders::{ambient_shader::AmbientShader, path_tracer_shader::PathTracerShader, whitted_shader::WhittedShader}};
+use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, render::IncrementalRenderer, shaders::{ambient_shader::AmbientShader, path_tracer_shader::PathTracerShader, whitted_shader::WhittedShader}, swapchain::DoubleBufferSwapChain};
 
+mod swapchain;
 mod utils;
 mod camera;
 mod rays;
@@ -36,25 +39,6 @@ fn main() {
     let mut scene = Scene::new();
     scene.load_obj_file(Path::new("./models/cornell_box_VI.obj"));
 
-    let amb_light = Light::Ambient(AmbientLight{color: RGB{r:0.3,g:0.3,b:0.3}});
-
-    let point_light = Light::Point(
-        PointLight{
-            color:RGB{r:0.9,g:0.9,b:0.9},
-            position:Point::new(273.0, 495.0, 279.5)
-        });
-
-    let a_light = Light::Area(
-        AreaLight::new(
-            RGB::new(0.4, 0.4, 0.4), 
-            Triangle::new(
-                Point::new(100.0, 525.0, 100.0), 
-                Point::new(130.0, 525.0, 100.0), 
-                Point::new(100.0, 525.0, 130.0), 
-                Vector::new(0.0, -1.0, 0.0),
-            )
-        )
-    );
     let b_light1 = Light::Area(
         AreaLight::new(
             RGB::new(0.6, 0.6, 0.6), 
@@ -78,9 +62,6 @@ fn main() {
         )
     );
 
-    //scene.add_light(amb_light);
-    //scene.add_light(point_light);
-    //scene.add_light(a_light);
     scene.add_light(b_light1);
     scene.add_light(b_light2);
 
@@ -90,16 +71,90 @@ fn main() {
         reflection_depth: 2,
         reflection_prob: 0.5,
     };
-    //let shader = AmbientShader{background: RGB { r: 0.05, g: 0.05, b: 0.55 }};
+
+    let mut window = Window::new(
+        "yep", 
+        width as usize, 
+        height as usize, 
+        WindowOptions::default()
+    ).unwrap();
+
+    window.set_target_fps(60);
+
+    render_loop_with_swapchain(camera, scene, shader, window, width, height);
+}
+
+
+fn render_loop<C,S>(camera: C, scene: Scene, shader: S, mut window: Window, width: u32, height: u32)
+    where
+        C: Camera + std::marker::Sync,
+        S: Shader + std::marker::Sync,
+{
 
     let mut image = ImageRGB::new(height, width);
+    let mut renderer = IncrementalRenderer::new(1, None, true);
 
-    render::standard_render(&camera, &scene, &shader, &mut image, 64);
-    
-    let ppm: ImagePPM = image.into();
-    ppm.save(Path::new("./out.ppm")).expect("failed to output ppm");
+    let mut buf: Vec<u32> = std::iter::repeat(0).take((width*height) as usize).collect();
+    let mut frame_number: u64 = 0;
 
-    println!("outputed ppm");
+    while window.is_open() && !window.is_key_down(Key::Escape){
+        let inst = Instant::now();
 
+        renderer.render(&camera, &scene, &shader, &mut image);
+        image.write_to_0rgb_u32(&mut buf);
+        frame_number+=1;
+
+        window
+            .update_with_buffer(&buf, width as usize, height as usize)
+            .unwrap();
+
+        println!("frame: {} | elapsed: {} ms", frame_number, inst.elapsed().as_millis());
+    }
+}
+
+fn render_loop_with_swapchain<C,S>(camera: C, scene: Scene, shader: S, mut window: Window, width: u32, height: u32)
+    where
+        C: Camera + std::marker::Sync,
+        S: Shader + std::marker::Sync,
+{
+    let swpchain = DoubleBufferSwapChain::new(width, height);
+
+    let render_continue = AtomicBool::new(true);
+    let render_finished = AtomicBool::new(false);
+
+    let frame_number = AtomicU64::new(0);
+
+    thread::scope(|s|{
+        s.spawn(||{
+            let mut image = ImageRGB::new(height, width);
+            let mut renderer = IncrementalRenderer::new(1, Some(128), true);
+
+            while !renderer.has_finished() && render_continue.load(Ordering::Relaxed){
+                renderer.render(&camera, &scene, &shader, &mut image);
+
+                swpchain.update_back(|b|{
+                    image.write_to_0rgb_u32(b);
+                });
+
+                frame_number.fetch_add(1, Ordering::Relaxed);
+            }
+            render_finished.store(true, Ordering::Relaxed);
+        });
+
+        while window.is_open() && !window.is_key_down(Key::Escape){
+            if !render_finished.load(Ordering::Relaxed){
+                let inst = Instant::now();
+                swpchain.wait_use_front(|buffer|{
+                    window
+                        .update_with_buffer(buffer, width as usize, height as usize)
+                        .unwrap();
+                });
+                println!("frame: {} | elapsed: {} ms", frame_number.load(Ordering::Relaxed), inst.elapsed().as_millis());
+            } else {
+                window.update();
+            }
+        }
+        render_continue.store(false, Ordering::Relaxed);
+    });
 }
 

@@ -35,6 +35,16 @@ impl ImageRGB{
         self.data[(y*self.width+x) as usize] += *rgb;
         true
     }
+
+    pub fn write_to_0rgb_u32(&self, out: &mut [u32]){
+        assert!(out.len()>=self.data.len());
+        for (i,pixel) in self.data.iter().enumerate(){
+            let r: u32 = (pixel.r * 255.0).min(255.0) as u32;
+            let g: u32 = (pixel.g * 255.0).min(255.0) as u32;
+            let b: u32 = (pixel.b * 255.0).min(255.0) as u32;
+            out[i] = 0u32 | r << 16 | g << 8 | b;
+        }
+    }
 }
 
 
