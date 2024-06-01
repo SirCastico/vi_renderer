@@ -1,7 +1,7 @@
 use std::{path::Path, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, Condvar}, thread, time::Instant};
 
 use camera::{perspective::Perspective, Camera};
-use images::{image_rgb::ImageRGB, image_ppm::ImagePPM};
+use images::{image_rgb::{self, ImageRGB}, image_ppm::ImagePPM};
 use lights::{Light, AmbientLight};
 use minifb::{Key, Window, WindowOptions};
 use scene::Scene;
@@ -41,7 +41,7 @@ fn main() {
 
     let b_light1 = Light::Area(
         AreaLight::new(
-            RGB::new(0.6, 0.6, 0.6), 
+            RGB::new(1.0, 1.0, 1.0), 
             Triangle::new(
                 Point::new(343.0, 548.0, 227.0), 
                 Point::new(343.0, 548.0, 332.0), 
@@ -52,7 +52,7 @@ fn main() {
     );
     let b_light2 = Light::Area(
         AreaLight::new(
-            RGB::new(0.6, 0.6, 0.6), 
+            RGB::new(1.0, 1.0, 1.0), 
             Triangle::new(
                 Point::new(213.0, 548.0, 332.0), 
                 Point::new(213.0, 548.0, 227.0), 
@@ -69,7 +69,7 @@ fn main() {
         background: RGB { r: 0.05, g: 0.05, b: 0.55 }, 
         collision_bias: 0.001f32, 
         reflection_depth: 2,
-        reflection_prob: 0.5,
+        continue_prob: 0.5,
     };
 
     let mut window = Window::new(
@@ -101,7 +101,7 @@ fn render_loop<C,S>(camera: C, scene: Scene, shader: S, mut window: Window, widt
         let inst = Instant::now();
 
         renderer.render(&camera, &scene, &shader, &mut image);
-        image.write_to_0rgb_u32(&mut buf);
+        image.write_to_0rgb_u32(&mut buf, image_rgb::tonemap_reinhard);
         frame_number+=1;
 
         window
@@ -127,13 +127,13 @@ fn render_loop_with_swapchain<C,S>(camera: C, scene: Scene, shader: S, mut windo
     thread::scope(|s|{
         s.spawn(||{
             let mut image = ImageRGB::new(height, width);
-            let mut renderer = IncrementalRenderer::new(1, Some(128), true);
+            let mut renderer = IncrementalRenderer::new(1, Some(2048), true);
 
             while !renderer.has_finished() && render_continue.load(Ordering::Relaxed){
                 renderer.render(&camera, &scene, &shader, &mut image);
 
                 swpchain.update_back(|b|{
-                    image.write_to_0rgb_u32(b);
+                    image.write_to_0rgb_u32(b, image_rgb::tonemap_reinhard);
                 });
 
                 frame_number.fetch_add(1, Ordering::Relaxed);

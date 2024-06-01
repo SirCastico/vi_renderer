@@ -11,7 +11,7 @@ use super::Shader;
 pub struct PathTracerShader{
     pub background: RGB,
     pub collision_bias: f32,
-    pub reflection_prob: f32,
+    pub continue_prob: f32,
     pub reflection_depth: u16
 }
 
@@ -216,21 +216,21 @@ impl PathTracerShader{
         }
 
         let rnd_depth: f32 = thread_rng().gen();
-        if depth>0 || rnd_depth<self.reflection_prob{
+        if depth>0 || rnd_depth<self.continue_prob{
             //println!("yep: {}", depth);
             let lcolor: RGB;
             let mdata = &tdata.mat_data;
             let s_p = mdata.ks.y() / (mdata.ks.y()+mdata.kd.y());
             let rnd: f32 = thread_rng().gen();
             if rnd <= s_p || s_p >= (1.0-ray::EPSILON){
-                lcolor = self.specular_reflection(scene, &tdata, depth);
+                lcolor = self.specular_reflection(scene, &tdata, depth) / s_p;
             } else {
-                lcolor = self.diffuse_reflection(scene, &tdata, depth);
+                lcolor = self.diffuse_reflection(scene, &tdata, depth) / (1.0-s_p);
             }
             if depth>0 {
                 color += lcolor;
             } else {
-                color += lcolor / self.reflection_prob;
+                color += lcolor / self.continue_prob;
             }
         }
 

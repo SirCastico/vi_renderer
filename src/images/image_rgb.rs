@@ -36,17 +36,22 @@ impl ImageRGB{
         true
     }
 
-    pub fn write_to_0rgb_u32(&self, out: &mut [u32]){
+    pub fn write_to_0rgb_u32<F>(&self, out: &mut [u32], tonemapper: F)
+            where F: Fn(f32)->f32
+        {
         assert!(out.len()>=self.data.len());
         for (i,pixel) in self.data.iter().enumerate(){
-            let r: u32 = (pixel.r * 255.0).min(255.0) as u32;
-            let g: u32 = (pixel.g * 255.0).min(255.0) as u32;
-            let b: u32 = (pixel.b * 255.0).min(255.0) as u32;
+            let r: u32 = (tonemapper(pixel.r) * 255.0).min(255.0) as u32;
+            let g: u32 = (tonemapper(pixel.g) * 255.0).min(255.0) as u32;
+            let b: u32 = (tonemapper(pixel.b) * 255.0).min(255.0) as u32;
             out[i] = 0u32 | r << 16 | g << 8 | b;
         }
     }
 }
 
+pub fn tonemap_reinhard(val: f32) -> f32{
+    val / (val + 1.0)
+}
 
 impl From<ImageRGB> for ImagePPM {
     fn from(value: ImageRGB) -> Self {
