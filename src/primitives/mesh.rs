@@ -59,16 +59,17 @@ impl Intersectable for Mesh{
         for (i,bb) in self.face_aabbs.iter().enumerate(){
             if bb.intersect(ray) {
 
-                let ta = self.positions[self.pos_inds[i*3] as usize];
-                let tb = self.positions[self.pos_inds[i*3+1] as usize];
-                let tc = self.positions[self.pos_inds[i*3+2] as usize];
 
                 //let na = self.normals[self.norm_inds[i*3] as usize];
                 //let nb = self.normals[self.norm_inds[i*3+1] as usize];
                 //let nc = self.normals[self.norm_inds[i*3+2] as usize];
 
                 let face = Face{
-                    positions: [ta,tb,tc],
+                    positions: [
+                        self.positions[self.pos_inds[i*3] as usize],
+                        self.positions[self.pos_inds[i*3+1] as usize],
+                        self.positions[self.pos_inds[i*3+2] as usize],
+                    ],
                     //normals: [na,nb,nc],
                 };
 
