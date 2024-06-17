@@ -1,4 +1,4 @@
-use crate::{primitives::Intersectable, rays::{intersection::IntersectionData, ray::Ray}, utils::{rgb::RGB, vector::{Point, Vector}}};
+use crate::{primitives::Intersectable, rays::{intersection::IntersectionData, ray::Ray}, utils::{rgb::RGB, vector::{Point}}};
 use crate::primitives::triangle::Triangle;
 
 
@@ -51,7 +51,7 @@ impl Intersectable for AreaLight{
         return self.tri.intersect(ray);
     }
     
-    fn visibility(&self, ray: &Ray, depth: f32) -> bool {
+    fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
         todo!()
     }
 }

@@ -1,4 +1,4 @@
-use crate::{utils::rgb::RGB, rays::intersection::IntersectionData, primitives::{material_data::MaterialData, Intersectable}, scene::{Scene, TraceData}, lights::Light};
+use crate::{utils::rgb::RGB, scene::{Scene, TraceData}, lights::Light};
 use super::Shader;
 
 

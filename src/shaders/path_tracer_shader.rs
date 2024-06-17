@@ -217,7 +217,6 @@ impl PathTracerShader{
 
         let rnd_depth: f32 = thread_rng().gen();
         if depth>0 || rnd_depth<self.continue_prob{
-            //println!("yep: {}", depth);
             let lcolor: RGB;
             let mdata = &tdata.mat_data;
             let s_p = mdata.ks.y() / (mdata.ks.y()+mdata.kd.y());

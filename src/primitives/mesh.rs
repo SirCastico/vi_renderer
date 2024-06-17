@@ -1,4 +1,4 @@
-use crate::{utils::{vector::{Point, Vector}, aabb::AABB}, rays::{ray::{Ray, self}, intersection::IntersectionData}};
+use crate::{utils::{vector::{Point, Vector}, aabb::AABB}, rays::{ray::{Ray}, intersection::IntersectionData}};
 
 use super::{triangle::{triangle_intersect, Face}, Intersectable};
 
@@ -34,7 +34,7 @@ impl Mesh{
             face_aabb.update(tc);
             face_aabbs.push(face_aabb);
         }
-        //println!("n_faces:{}", face_aabbs.len());
+
         Self {
             positions: positions.into_boxed_slice(),
             normals: normals.into_boxed_slice(),
@@ -85,7 +85,7 @@ impl Intersectable for Mesh{
         isect
     }
 
-    fn visibility(&self, ray: &Ray, depth: f32) -> bool {
+    fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
         todo!()
     }
 }

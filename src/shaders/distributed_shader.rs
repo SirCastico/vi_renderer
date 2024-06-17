@@ -1,6 +1,6 @@
 use rand::{thread_rng, Rng};
 
-use crate::{utils::{rgb::RGB, vector::Vector}, rays::{intersection::IntersectionData, ray::Ray}, primitives::{material_data::MaterialData, Intersectable}, scene::{Scene, TraceData}, lights::Light};
+use crate::{utils::{rgb::RGB, vector::Vector}, rays::{ray::Ray}, scene::{Scene, TraceData}, lights::Light};
 use super::Shader;
 
 

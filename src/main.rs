@@ -1,15 +1,15 @@
-use std::{path::Path, sync::{atomic::{AtomicBool, AtomicU64, Ordering}, Condvar}, thread, time::Instant};
+use std::{path::Path, sync::{atomic::{AtomicBool, AtomicU64, Ordering}}, thread, time::Instant};
 
 use camera::{perspective::Perspective, Camera};
-use images::{image_rgb::{self, ImageRGB}, image_ppm::ImagePPM};
-use lights::{Light, AmbientLight};
+use images::{image_rgb::{self, ImageRGB}};
+use lights::{Light};
 use minifb::{Key, Window, WindowOptions};
 use render::standard_render;
 use scene::Scene;
 use shaders::Shader;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::{AreaLight, PointLight}, primitives::triangle::Triangle, render::IncrementalRenderer, shaders::{ambient_shader::AmbientShader, path_tracer_shader::PathTracerShader, whitted_shader::WhittedShader}, swapchain::DoubleBufferSwapChain};
+use crate::{lights::{AreaLight}, primitives::triangle::Triangle, render::IncrementalRenderer, shaders::{path_tracer_shader::PathTracerShader}, swapchain::DoubleBufferSwapChain};
 
 mod swapchain;
 mod utils;
