@@ -16,6 +16,7 @@ impl Buffer{
 struct DoubleBufferSwapChainBufferData{
     pub buf_ready: [bool; 2],
     pub front: u8,
+    pub is_closed: bool,
 }
 
 pub struct DoubleBufferSwapChain{
@@ -40,16 +41,26 @@ impl DoubleBufferSwapChain{
             buf_data: Mutex::new(DoubleBufferSwapChainBufferData{
                 buf_ready: [false,false],
                 front: 0,
+                is_closed: false,
             }),
         }
     }
 
-    pub fn update_back<OP>(&self, f: OP)
+    pub fn close(&self){
+        let mut bdata = self.buf_data.lock().unwrap();
+        bdata.is_closed = true;
+    }
+
+    // returns true if swapchain is open, false otherwise
+    pub fn update_back<OP>(&self, f: OP) -> bool
         where OP: FnOnce(&mut [u32])
     {
         let b_ind: usize;
         {
             let bdata = self.buf_data.lock().unwrap();
+            if bdata.is_closed {
+                return false;
+            }
             if !bdata.buf_ready[bdata.front as usize] {
                 b_ind = bdata.front as usize;
             } else {
@@ -67,14 +78,19 @@ impl DoubleBufferSwapChain{
         }
 
         self.cond_vars[b_ind].notify_one();
+        return true;
     }
 
-    pub fn wait_use_front<OP>(&self, f: OP)
+    // returns true if swapchain is open, false otherwise
+    pub fn wait_use_front<OP>(&self, f: OP) -> bool
         where OP: FnOnce(&[u32])
     {
         let b_mtx;
         {
             let mut bdata = self.buf_data.lock().unwrap();
+            if bdata.is_closed {
+                return false;
+            }
             while !bdata.buf_ready[bdata.front as usize]{
                 bdata = self.cond_vars[bdata.front as usize].wait(bdata).unwrap();
             }
@@ -90,6 +106,7 @@ impl DoubleBufferSwapChain{
             bdata.buf_ready[fr as usize] = false;
             bdata.front ^= 1;
         }
+        return true;
     }
 
 }

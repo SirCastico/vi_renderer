@@ -9,7 +9,7 @@ use scene::Scene;
 use shaders::Shader;
 use utils::{rgb::RGB, vector::{Point, Vector}, Extent2D};
 
-use crate::{lights::{AreaLight}, primitives::triangle::Triangle, render::IncrementalRenderer, shaders::{path_tracer_shader::PathTracerShader}, swapchain::DoubleBufferSwapChain};
+use crate::{lights::{AreaLight}, primitives::triangle::Triangle, render::IncrementalRenderer, shaders::{distributed_shader::DistributedShader, path_tracer_shader::PathTracerShader}, swapchain::DoubleBufferSwapChain};
 
 mod swapchain;
 mod utils;
@@ -73,8 +73,13 @@ fn main() {
         continue_prob: 0.5,
     };
 
+    //let shader = DistributedShader{
+    //    background: RGB { r: 0.05, g: 0.05, b: 0.55 }, 
+    //    shadow_bias: 0.001f32, 
+    //    reflection_depth: 2,
+    //};
 
-    let renderer = IncrementalRenderer::new(1, Some(2048), true);
+    let renderer = IncrementalRenderer::new(1, Some(64), true);
 
     let mut window = Window::new(
         "yep", 
@@ -85,9 +90,15 @@ fn main() {
 
     window.set_target_fps(60);
 
+    let inst = Instant::now();
+
     render_loop_with_swapchain(camera, scene, shader, window, width, height, renderer);
+    //render_loop(camera, scene, shader, window, width, height, renderer);
     //render_loop_sequential(camera, scene, shader, window, width, height, 128, true);
+
+    println!("total time: {}.{} seconds", inst.elapsed().as_secs(), inst.elapsed().subsec_millis());
 }
+
 
 fn render_loop_sequential<C,S>(camera: C, scene: Scene, shader: S, mut window: Window, width: u32, height: u32, spp: usize, jitter: bool)
     where
@@ -125,13 +136,20 @@ fn render_loop<C,S>(camera: C, scene: Scene, shader: S, mut window: Window, widt
     while window.is_open() && !window.is_key_down(Key::Escape){
         let inst = Instant::now();
 
-        renderer.render(&camera, &scene, &shader, &mut image);
-        image.write_to_0rgb_u32(&mut buf, image_rgb::tonemap_reinhard);
-        frame_number+=1;
+        if !renderer.has_finished(){
+            renderer.render(&camera, &scene, &shader, &mut image);
+            image.write_to_0rgb_u32(&mut buf, image_rgb::tonemap_reinhard);
+            frame_number+=1;
 
-        window
-            .update_with_buffer(&buf, width as usize, height as usize)
-            .unwrap();
+            let upd_inst = Instant::now();
+            window
+                .update_with_buffer(&buf, width as usize, height as usize)
+                .unwrap();
+
+            println!("upd elapsed: {} micros", upd_inst.elapsed().as_micros());
+        } else {
+            window.update();
+        }
 
         println!("frame: {} | elapsed: {} ms", frame_number, inst.elapsed().as_millis());
     }
@@ -144,45 +162,49 @@ fn render_loop_with_swapchain<C,S>(camera: C, scene: Scene, shader: S, mut windo
 {
     let swpchain = DoubleBufferSwapChain::new(width, height);
 
-    let render_continue = AtomicBool::new(true);
-    let render_finished = AtomicBool::new(false);
-
     let frame_number = AtomicU64::new(0);
 
     thread::scope(|s|{
         s.spawn(||{
             let mut image = ImageRGB::new(height, width);
 
-            while !renderer.has_finished() && render_continue.load(Ordering::Relaxed){
+            while !renderer.has_finished(){
                 let inst = Instant::now();
                 renderer.render(&camera, &scene, &shader, &mut image);
 
-                swpchain.update_back(|b|{
+                let is_open = swpchain.update_back(|b|{
                     image.write_to_0rgb_u32(b, image_rgb::tonemap_reinhard);
                 });
 
+                if !is_open {
+                    println!("[renderer] closed");
+                    break;
+                }
+
                 frame_number.fetch_add(1, Ordering::Relaxed);
-                print!("(frame_gen: {} | gen: {} ms) ", frame_number.load(Ordering::Relaxed), inst.elapsed().as_millis());
+                println!("([renderer] frame-gen: {} ms) ", inst.elapsed().as_millis());
             }
-            render_finished.store(true, Ordering::Relaxed);
+            swpchain.close();
+            println!("[renderer] closing");
         });
 
         while window.is_open() && !window.is_key_down(Key::Escape){
-            if !render_finished.load(Ordering::Relaxed){
-                let inst = Instant::now();
-                swpchain.wait_use_front(|buffer|{
-                    let upd_inst = Instant::now();
-                    window
-                        .update_with_buffer(buffer, width as usize, height as usize)
-                        .unwrap();
-                    print!("upd: {} micros | ", upd_inst.elapsed().as_micros());
-                });
-                println!("frame: {} | elapsed: {} ms", frame_number.load(Ordering::Relaxed), inst.elapsed().as_millis());
-            } else {
+            let inst = Instant::now();
+            let is_open = swpchain.wait_use_front(|buffer|{
+                //let upd_inst = Instant::now();
+                window
+                    .update_with_buffer(buffer, width as usize, height as usize)
+                    .unwrap();
+                //print!("[event loop] upd: {} micros | ", upd_inst.elapsed().as_micros());
+            });
+            if !is_open{
+                println!("[event loop] closed");
                 window.update();
             }
+            println!("[event loop] frame: {} | elapsed: {} ms", frame_number.load(Ordering::Relaxed), inst.elapsed().as_millis());
         }
-        render_continue.store(false, Ordering::Relaxed);
+        swpchain.close();
+        println!("[event loop] closing");
     });
 }
 
