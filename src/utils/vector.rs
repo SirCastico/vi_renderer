@@ -8,7 +8,6 @@ pub struct Vector {
 }
 
 impl Vector {
-
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Vector { x, y, z }
     }
@@ -22,7 +21,7 @@ impl Vector {
     pub fn norm(&self) -> f32 {
         return (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
     }
-    
+
     pub fn normalize(&mut self) {
         let my_norm = self.norm();
         if my_norm > 0.0 {
@@ -85,7 +84,7 @@ impl Vector {
         }
     }
 
-    pub fn coordinate_system(&self) -> (Vector, Vector){
+    pub fn coordinate_system(&self) -> (Vector, Vector) {
         let v2: Vector;
         let v3: Vector;
         if self.x.abs() > self.y.abs() {
@@ -94,7 +93,7 @@ impl Vector {
             v2 = Vector::new(0.0, self.z, -self.y) / (self.y * self.y + self.z * self.z).sqrt();
         }
         v3 = self.cross(v2);
-        return (v2,v3);
+        return (v2, v3);
     }
 
     pub fn rotate(&self, rx: Vector, ry: Vector, rz: Vector) -> Vector {
@@ -104,10 +103,9 @@ impl Vector {
             z: self.x * rx.z + self.y * ry.z + self.z * rz.z,
         }
     }
-
 }
 
-impl ops::Add<Vector> for Vector{
+impl ops::Add<Vector> for Vector {
     type Output = Vector;
 
     fn add(self, other: Vector) -> Vector {
@@ -119,7 +117,7 @@ impl ops::Add<Vector> for Vector{
     }
 }
 
-impl ops::Sub<Vector> for Vector{
+impl ops::Sub<Vector> for Vector {
     type Output = Vector;
 
     fn sub(self, other: Vector) -> Vector {
@@ -131,7 +129,7 @@ impl ops::Sub<Vector> for Vector{
     }
 }
 
-impl ops::Mul<f32> for Vector{
+impl ops::Mul<f32> for Vector {
     type Output = Vector;
 
     fn mul(self, scalar: f32) -> Vector {
@@ -143,8 +141,7 @@ impl ops::Mul<f32> for Vector{
     }
 }
 
-
-impl ops::Mul<Vector> for f32{
+impl ops::Mul<Vector> for f32 {
     type Output = Vector;
 
     fn mul(self, v: Vector) -> Vector {
@@ -168,8 +165,7 @@ impl ops::Mul<Vector> for f32{
 //    }
 //}
 
-
-impl ops::Div<f32> for Vector{
+impl ops::Div<f32> for Vector {
     type Output = Vector;
 
     fn div(self, scalar: f32) -> Vector {
@@ -181,7 +177,7 @@ impl ops::Div<f32> for Vector{
     }
 }
 
-impl ops::Div<Vector> for f32{
+impl ops::Div<Vector> for f32 {
     type Output = Vector;
 
     fn div(self, v: Vector) -> Vector {
@@ -225,7 +221,7 @@ impl Point {
     }
 }
 
-impl Into<Vector> for Point{
+impl Into<Vector> for Point {
     fn into(self) -> Vector {
         Vector {
             x: self.x,
@@ -283,7 +279,6 @@ impl ops::Mul<Point> for f32 {
     }
 }
 
-
 impl ops::Mul<Point> for f64 {
     type Output = Point;
 
@@ -295,7 +290,6 @@ impl ops::Mul<Point> for f64 {
         }
     }
 }
-
 
 impl ops::Add<Vector> for Point {
     type Output = Point;

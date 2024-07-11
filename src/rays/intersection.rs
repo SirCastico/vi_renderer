@@ -1,4 +1,4 @@
-use crate::utils::{vector::{Point, Vector}};
+use crate::utils::vector::{Point, Vector};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct IntersectionData {
@@ -7,4 +7,3 @@ pub struct IntersectionData {
     pub wo: Vector,
     pub depth: f32,
 }
-

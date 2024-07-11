@@ -1,28 +1,27 @@
-use std::path::Path;
 use std::fs::File;
 use std::io::Write;
-
+use std::path::Path;
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct PPMPixel{
-    pub rgb: [u8; 3]
+pub struct PPMPixel {
+    pub rgb: [u8; 3],
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ImagePPM{
+pub struct ImagePPM {
     pub data: Box<[PPMPixel]>,
     pub width: u32,
     pub height: u32,
 }
 
-impl ImagePPM{
-    pub fn new(width: u32, height: u32) -> Self{
+impl ImagePPM {
+    pub fn new(width: u32, height: u32) -> Self {
         let mut v = Vec::new();
-        v.resize((width*height) as usize, PPMPixel::default());
+        v.resize((width * height) as usize, PPMPixel::default());
         Self {
             data: v.into_boxed_slice(),
             width,
-            height
+            height,
         }
     }
 
@@ -37,4 +36,3 @@ impl ImagePPM{
         Ok(())
     }
 }
-

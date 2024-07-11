@@ -2,22 +2,24 @@ use core::f32;
 
 use rand::{thread_rng, Rng};
 
-use crate::{lights::Light, rays::ray::{self, Ray}, scene::{Scene, TraceData}, utils::{rgb::RGB, vector::Vector}};
+use crate::{
+    lights::Light,
+    rays::ray::{self, Ray},
+    scene::{Scene, TraceData},
+    utils::{rgb::RGB, vector::Vector},
+};
 
 use super::Shader;
 
-
-
-pub struct PathTracerShader{
+pub struct PathTracerShader {
     pub background: RGB,
     pub collision_bias: f32,
     pub continue_prob: f32,
-    pub reflection_depth: u16
+    pub reflection_depth: u16,
 }
 
-impl PathTracerShader{
-
-    fn diffuse_reflection(&self, scene: &Scene, tdata: &TraceData, depth:u16) -> RGB{
+impl PathTracerShader {
+    fn diffuse_reflection(&self, scene: &Scene, tdata: &TraceData, depth: u16) -> RGB {
         let color = RGB::new(0.0, 0.0, 0.0);
 
         let mut rng = thread_rng();
@@ -25,9 +27,9 @@ impl PathTracerShader{
 
         let cos_theta = rnd[1].sqrt();
         let d_around_z = Vector::new(
-            (2.0*f32::consts::PI*rnd[0]).cos()*(1.0-rnd[1]).sqrt(), 
-            (2.0*f32::consts::PI*rnd[0]).sin()*(1.0-rnd[1]).sqrt(), 
-            cos_theta, 
+            (2.0 * f32::consts::PI * rnd[0]).cos() * (1.0 - rnd[1]).sqrt(),
+            (2.0 * f32::consts::PI * rnd[0]).sin() * (1.0 - rnd[1]).sqrt(),
+            cos_theta,
         );
         let pdf = cos_theta / f32::consts::PI;
         let (rx, ry) = tdata.isect.geo_normal.coordinate_system();
@@ -38,22 +40,21 @@ impl PathTracerShader{
         );
 
         let ntdata_opt = scene.trace(&diffuse);
-        if let Some(ntdata) = ntdata_opt{
-            if ntdata.mat_data.le.is_some(){
+        if let Some(ntdata) = ntdata_opt {
+            if ntdata.mat_data.le.is_some() {
                 return color;
             }
         }
         let rcolor: RGB;
-        if depth>0{
-            rcolor = self.shade_impl(scene, &ntdata_opt, depth-1);
-        }
-        else {
+        if depth > 0 {
+            rcolor = self.shade_impl(scene, &ntdata_opt, depth - 1);
+        } else {
             rcolor = self.shade_impl(scene, &ntdata_opt, depth);
         }
         return (tdata.mat_data.kd * cos_theta * rcolor) / pdf;
     }
 
-    fn specular_reflection(&self, scene: &Scene, tdata: &TraceData, depth:u16) -> RGB{
+    fn specular_reflection(&self, scene: &Scene, tdata: &TraceData, depth: u16) -> RGB {
         let gn = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
         let cos = gn.dot(tdata.isect.wo);
         let ray_dir = 2.0 * cos * gn - tdata.isect.wo;
@@ -63,20 +64,19 @@ impl PathTracerShader{
 
         let sp_tdata_opt = scene.trace(&sp_ray);
         let rcolor: RGB;
-        if depth>0{
-            rcolor = self.shade_impl(scene, &sp_tdata_opt, depth-1);
-        }
-        else {
+        if depth > 0 {
+            rcolor = self.shade_impl(scene, &sp_tdata_opt, depth - 1);
+        } else {
             rcolor = self.shade_impl(scene, &sp_tdata_opt, depth);
         }
         return rcolor * tdata.mat_data.ks;
     }
 
-    fn direct_lighting_smpl(&self, scene: &Scene, tdata: &TraceData) -> RGB{
+    fn direct_lighting_smpl(&self, scene: &Scene, tdata: &TraceData) -> RGB {
         let mut color = RGB::default();
         let rnd_ind = thread_rng().gen::<usize>() % scene.lights.len();
 
-        match scene.lights[rnd_ind]{
+        match scene.lights[rnd_ind] {
             Light::Ambient(ambient_light) => {
                 color += tdata.mat_data.ka * ambient_light.color;
             }
@@ -91,23 +91,24 @@ impl PathTracerShader{
                 let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                 g_normal.normalize();
 
-                if ray_dir.dot(g_normal) < 0.0{
+                if ray_dir.dot(g_normal) < 0.0 {
                     return color;
                 }
 
                 let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                 let ray: Ray = Ray::new(ray_o, ray_dir);
                 let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
-                
+
                 if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
-                    color += tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
+                    color +=
+                        tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
                 }
             }
             Light::Area(area_light) => {
                 if tdata.mat_data.kd.is_zero() {
                     return color;
                 }
-                
+
                 let mut rng = thread_rng();
                 let rnd = [rng.gen(), rng.gen()];
                 let (l_int, l_point) = area_light.stochastic_radiance(&rnd);
@@ -119,17 +120,19 @@ impl PathTracerShader{
                 let cosl = l_dir.dot(tdata.isect.geo_normal.face_forward(l_dir));
                 let cosl_la = l_dir.dot(area_light.tri.normal);
 
-                if cosl>0. && cosl_la<=0.0 {
+                if cosl > 0. && cosl_la <= 0.0 {
                     let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                     g_normal.normalize();
 
                     let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                     let ray: Ray = Ray::new(ray_o, l_dir);
                     let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
-                    
-                    if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.collision_bias
-                        || light_tdata_opt.unwrap().mat_data.le.is_some() {
-                            color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
+
+                    if light_tdata_opt.is_none()
+                        || light_tdata_opt.unwrap().isect.depth >= light_dist - self.collision_bias
+                        || light_tdata_opt.unwrap().mat_data.le.is_some()
+                    {
+                        color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                     }
                 }
             }
@@ -137,11 +140,11 @@ impl PathTracerShader{
         color * scene.lights.len() as f32
     }
 
-    fn direct_lighting(&self, scene: &Scene, tdata: &TraceData) -> RGB{
+    fn direct_lighting(&self, scene: &Scene, tdata: &TraceData) -> RGB {
         let mut color = RGB::default();
 
-        for light in scene.lights.iter(){
-            match light{
+        for light in scene.lights.iter() {
+            match light {
                 Light::Ambient(ambient_light) => {
                     color += tdata.mat_data.ka * ambient_light.color;
                 }
@@ -156,23 +159,26 @@ impl PathTracerShader{
                     let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                     g_normal.normalize();
 
-                    if ray_dir.dot(g_normal) < 0.0{
+                    if ray_dir.dot(g_normal) < 0.0 {
                         continue;
                     }
 
                     let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                     let ray: Ray = Ray::new(ray_o, ray_dir);
                     let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
-                    
-                    if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
-                        color += tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
+
+                    if light_tdata_opt.is_none()
+                        || light_tdata_opt.unwrap().isect.depth >= light_dist
+                    {
+                        color +=
+                            tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
                     }
                 }
                 Light::Area(area_light) => {
                     if tdata.mat_data.kd.is_zero() {
                         continue;
                     }
-                    
+
                     let mut rng = thread_rng();
                     let rnd = [rng.gen(), rng.gen()];
                     let (l_int, l_point) = area_light.stochastic_radiance(&rnd);
@@ -184,17 +190,20 @@ impl PathTracerShader{
                     let cosl = l_dir.dot(tdata.isect.geo_normal.face_forward(l_dir));
                     let cosl_la = l_dir.dot(area_light.tri.normal);
 
-                    if cosl>0. && cosl_la<=0.0 {
+                    if cosl > 0. && cosl_la <= 0.0 {
                         let mut g_normal = tdata.isect.geo_normal.face_forward(tdata.isect.wo);
                         g_normal.normalize();
 
                         let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                         let ray: Ray = Ray::new(ray_o, l_dir);
                         let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
-                        
-                        if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist-self.collision_bias
-                            || light_tdata_opt.unwrap().mat_data.le.is_some() {
-                                color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
+
+                        if light_tdata_opt.is_none()
+                            || light_tdata_opt.unwrap().isect.depth
+                                >= light_dist - self.collision_bias
+                            || light_tdata_opt.unwrap().mat_data.le.is_some()
+                        {
+                            color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                         }
                     }
                 }
@@ -211,22 +220,22 @@ impl PathTracerShader{
             return self.background;
         }
         let tdata = tdata_opt.unwrap();
-        if let Some(le) = tdata.mat_data.le{
+        if let Some(le) = tdata.mat_data.le {
             return le;
         }
 
         let rnd_depth: f32 = thread_rng().gen();
-        if depth>0 || rnd_depth<self.continue_prob{
+        if depth > 0 || rnd_depth < self.continue_prob {
             let lcolor: RGB;
             let mdata = &tdata.mat_data;
-            let s_p = mdata.ks.y() / (mdata.ks.y()+mdata.kd.y());
+            let s_p = mdata.ks.y() / (mdata.ks.y() + mdata.kd.y());
             let rnd: f32 = thread_rng().gen();
-            if rnd <= s_p || s_p >= (1.0-ray::EPSILON){
+            if rnd <= s_p || s_p >= (1.0 - ray::EPSILON) {
                 lcolor = self.specular_reflection(scene, &tdata, depth) / s_p;
             } else {
-                lcolor = self.diffuse_reflection(scene, &tdata, depth) / (1.0-s_p);
+                lcolor = self.diffuse_reflection(scene, &tdata, depth) / (1.0 - s_p);
             }
-            if depth>0 {
+            if depth > 0 {
                 color += lcolor;
             } else {
                 color += lcolor / self.continue_prob;
@@ -236,11 +245,14 @@ impl PathTracerShader{
         color += self.direct_lighting_smpl(scene, &tdata);
         color
     }
-
 }
 
-impl Shader for PathTracerShader{
-    fn shade(&self, scene: &crate::scene::Scene, tdata_opt: &Option<crate::scene::TraceData>) -> RGB {
+impl Shader for PathTracerShader {
+    fn shade(
+        &self,
+        scene: &crate::scene::Scene,
+        tdata_opt: &Option<crate::scene::TraceData>,
+    ) -> RGB {
         self.shade_impl(scene, tdata_opt, self.reflection_depth)
     }
 }

@@ -1,7 +1,7 @@
 use crate::rays::intersection::IntersectionData;
 use crate::rays::ray::{self, Ray};
-use crate::utils::vector::{Point, Vector};
 use crate::utils::aabb::AABB;
+use crate::utils::vector::{Point, Vector};
 
 use super::Intersectable;
 
@@ -13,7 +13,6 @@ pub struct Triangle {
     pub normal: Vector,
     pub bb: AABB, // Using AABB as the bounding box type
 }
-
 
 impl Triangle {
     pub fn new(v1: Point, v2: Point, v3: Point, normal: Vector) -> Self {
@@ -41,15 +40,15 @@ impl Triangle {
     }
 }
 
-impl Intersectable for Triangle{
+impl Intersectable for Triangle {
     fn intersect(&self, ray: &Ray) -> Option<IntersectionData> {
-        if !self.bb.intersect(ray){
+        if !self.bb.intersect(ray) {
             return Option::None;
         }
-        let face = Face { 
-            positions: [self.v1,self.v2,self.v3] 
+        let face = Face {
+            positions: [self.v1, self.v2, self.v3],
         };
-        return triangle_intersect(ray, &face)
+        return triangle_intersect(ray, &face);
     }
 
     fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
@@ -58,7 +57,7 @@ impl Intersectable for Triangle{
 }
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct Face{
+pub struct Face {
     pub positions: [Point; 3],
     //pub normals: [Vector; 3],
 }
@@ -72,7 +71,7 @@ pub fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
     let ray_cross_e2 = ray.direction.cross(e2);
     let det = e1.dot(ray_cross_e2);
 
-    if det > -ray::EPSILON && det < ray::EPSILON{
+    if det > -ray::EPSILON && det < ray::EPSILON {
         return None; // ray is parallel
     }
 
@@ -80,26 +79,26 @@ pub fn triangle_intersect(ray: &Ray, face: &Face) -> Option<IntersectionData> {
     let s: Vector = (ray.origin - face.positions[0]).into();
     let u = inv_det * s.dot(ray_cross_e2);
 
-    if u<0.0 || u>1.0{
+    if u < 0.0 || u > 1.0 {
         return None;
     }
 
     let s_cross_e1 = s.cross(e1);
     let v = inv_det * ray.direction.dot(s_cross_e1);
-    if v<0.0 || u+v>1.0 {
+    if v < 0.0 || u + v > 1.0 {
         return None;
     }
 
     let t = inv_det * e2.dot(s_cross_e1);
 
-    if t > ray::EPSILON{
+    if t > ray::EPSILON {
         let ipoint = ray.origin + ray.direction * t;
         let mut gn = e1.cross(e2);
         gn.normalize();
-        return Some(IntersectionData { 
-            point: ipoint, 
-            geo_normal: gn, 
-            wo: -1.0*ray.direction, 
+        return Some(IntersectionData {
+            point: ipoint,
+            geo_normal: gn,
+            wo: -1.0 * ray.direction,
             depth: t,
             ..Default::default()
         });

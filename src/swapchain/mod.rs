@@ -1,59 +1,58 @@
 use std::sync::{Condvar, Mutex};
 
-
-struct Buffer{
+struct Buffer {
     buf: Vec<u32>,
 }
 
-impl Buffer{
-    pub fn new(width: u32, height: u32) -> Self{
-        Self { 
-            buf: std::iter::repeat(0).take((width*height) as usize).collect(),
+impl Buffer {
+    pub fn new(width: u32, height: u32) -> Self {
+        Self {
+            buf: std::iter::repeat(0)
+                .take((width * height) as usize)
+                .collect(),
         }
     }
 }
 
-struct DoubleBufferSwapChainBufferData{
+struct DoubleBufferSwapChainBufferData {
     pub buf_ready: [bool; 2],
     pub front: u8,
     pub is_closed: bool,
 }
 
-pub struct DoubleBufferSwapChain{
+pub struct DoubleBufferSwapChain {
     buffers: [Mutex<Buffer>; 2],
     cond_vars: [Condvar; 2],
-    buf_data: Mutex<DoubleBufferSwapChainBufferData> // see if there is a better way than this
+    buf_data: Mutex<DoubleBufferSwapChainBufferData>, // see if there is a better way than this
 }
 
 // later see if we can enforce reader writer api
 
-impl DoubleBufferSwapChain{
-    pub fn new(width: u32, height: u32) -> Self{
+impl DoubleBufferSwapChain {
+    pub fn new(width: u32, height: u32) -> Self {
         Self {
             buffers: [
                 Mutex::new(Buffer::new(width, height)),
                 Mutex::new(Buffer::new(width, height)),
             ],
-            cond_vars: [
-                Condvar::new(),
-                Condvar::new(),
-            ],
-            buf_data: Mutex::new(DoubleBufferSwapChainBufferData{
-                buf_ready: [false,false],
+            cond_vars: [Condvar::new(), Condvar::new()],
+            buf_data: Mutex::new(DoubleBufferSwapChainBufferData {
+                buf_ready: [false, false],
                 front: 0,
                 is_closed: false,
             }),
         }
     }
 
-    pub fn close(&self){
+    pub fn close(&self) {
         let mut bdata = self.buf_data.lock().unwrap();
         bdata.is_closed = true;
     }
 
     // returns true if swapchain is open, false otherwise
     pub fn update_back<OP>(&self, f: OP) -> bool
-        where OP: FnOnce(&mut [u32])
+    where
+        OP: FnOnce(&mut [u32]),
     {
         let b_ind: usize;
         {
@@ -83,7 +82,8 @@ impl DoubleBufferSwapChain{
 
     // returns true if swapchain is open, false otherwise
     pub fn wait_use_front<OP>(&self, f: OP) -> bool
-        where OP: FnOnce(&[u32])
+    where
+        OP: FnOnce(&[u32]),
     {
         let b_mtx;
         {
@@ -91,7 +91,7 @@ impl DoubleBufferSwapChain{
             if bdata.is_closed {
                 return false;
             }
-            while !bdata.buf_ready[bdata.front as usize]{
+            while !bdata.buf_ready[bdata.front as usize] {
                 bdata = self.cond_vars[bdata.front as usize].wait(bdata).unwrap();
             }
             b_mtx = &self.buffers[bdata.front as usize];
@@ -108,5 +108,4 @@ impl DoubleBufferSwapChain{
         }
         return true;
     }
-
 }

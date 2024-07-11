@@ -1,13 +1,14 @@
-use crate::{utils::rgb::RGB, scene::{Scene, TraceData}, lights::Light};
 use super::Shader;
-
-
+use crate::{
+    lights::Light,
+    scene::{Scene, TraceData},
+    utils::rgb::RGB,
+};
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct AmbientShader{
-    pub background: RGB
+pub struct AmbientShader {
+    pub background: RGB,
 }
-
 
 impl Shader for AmbientShader {
     fn shade(&self, scene: &Scene, tdata_opt: &Option<TraceData>) -> RGB {
@@ -35,4 +36,3 @@ impl Shader for AmbientShader {
         color
     }
 }
-
