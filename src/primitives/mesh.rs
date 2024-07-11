@@ -93,8 +93,35 @@ impl Intersectable for Mesh {
         isect
     }
 
-    fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
-        todo!()
+    fn test_line_intersect(&self, ray: &Ray, depth: f32) -> bool {
+        if !self.aabb.intersect(ray) {
+            return false;
+        }
+
+        for (i, bb) in self.face_aabbs.iter().enumerate() {
+            if bb.intersect(ray) {
+                //let na = self.normals[self.norm_inds[i*3] as usize];
+                //let nb = self.normals[self.norm_inds[i*3+1] as usize];
+                //let nc = self.normals[self.norm_inds[i*3+2] as usize];
+
+                let face = Face {
+                    positions: [
+                        self.positions[self.pos_inds[i * 3] as usize],
+                        self.positions[self.pos_inds[i * 3 + 1] as usize],
+                        self.positions[self.pos_inds[i * 3 + 2] as usize],
+                    ],
+                    //normals: [na,nb,nc],
+                };
+
+                if let Some(face_isect) = triangle_intersect(ray, &face) {
+                    if face_isect.depth < depth {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
     }
 }
 

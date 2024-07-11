@@ -97,12 +97,15 @@ impl PathTracerShader {
 
                 let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                 let ray: Ray = Ray::new(ray_o, ray_dir);
-                let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
-
-                if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
+                if !scene.test_line_intersect(&ray, light_dist) {
                     color +=
                         tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
                 }
+                //let light_tdata_opt = scene.trace(&ray);
+                //if light_tdata_opt.is_none() || light_tdata_opt.unwrap().isect.depth >= light_dist {
+                //    color +=
+                //        tdata.mat_data.kd * point_light.color * 0f32.max(g_normal.dot(ray_dir));
+                //}
             }
             Light::Area(area_light) => {
                 if tdata.mat_data.kd.is_zero() {
@@ -126,14 +129,17 @@ impl PathTracerShader {
 
                     let ray_o = tdata.isect.point + g_normal * self.collision_bias;
                     let ray: Ray = Ray::new(ray_o, l_dir);
-                    let light_tdata_opt = scene.trace(&ray); // TODO: visibility instead of trace
 
-                    if light_tdata_opt.is_none()
-                        || light_tdata_opt.unwrap().isect.depth >= light_dist - self.collision_bias
-                        || light_tdata_opt.unwrap().mat_data.le.is_some()
-                    {
+                    if !scene.test_line_intersect(&ray, light_dist - self.collision_bias * 2.0) {
                         color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
                     }
+                    //let light_tdata_opt = scene.trace(&ray);
+                    //if light_tdata_opt.is_none()
+                    //    || light_tdata_opt.unwrap().isect.depth >= light_dist - self.collision_bias
+                    //    || light_tdata_opt.unwrap().mat_data.le.is_some()
+                    //{
+                    //    color += tdata.mat_data.kd * l_int * 0f32.max(g_normal.dot(l_dir));
+                    //}
                 }
             }
         }

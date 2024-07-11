@@ -51,7 +51,7 @@ impl Intersectable for Triangle {
         return triangle_intersect(ray, &face);
     }
 
-    fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
+    fn test_line_intersect(&self, _ray: &Ray, _depth: f32) -> bool {
         todo!()
     }
 }

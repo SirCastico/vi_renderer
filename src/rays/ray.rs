@@ -20,11 +20,4 @@ impl Ray {
             direction_inv,
         }
     }
-    pub fn adjust_origin(&mut self, normal: &Vector) {
-        let mut offset = EPSILON * *normal;
-        if self.direction.dot(*normal) < 0f32 {
-            offset = -1f32 * offset;
-        }
-        self.origin = self.origin + offset;
-    }
 }

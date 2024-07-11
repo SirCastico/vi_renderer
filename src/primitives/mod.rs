@@ -7,5 +7,5 @@ pub mod triangle;
 pub trait Intersectable {
     fn intersect(&self, ray: &Ray) -> Option<IntersectionData>;
 
-    fn visibility(&self, ray: &Ray, depth: f32) -> bool;
+    fn test_line_intersect(&self, ray: &Ray, depth: f32) -> bool;
 }

@@ -54,8 +54,11 @@ impl Intersectable for AreaLight {
         return self.tri.intersect(ray);
     }
 
-    fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
-        todo!()
+    fn test_line_intersect(&self, ray: &Ray, depth: f32) -> bool {
+        return self
+            .tri
+            .intersect(ray)
+            .is_some_and(|isect| isect.depth < depth);
     }
 }
 

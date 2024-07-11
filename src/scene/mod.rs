@@ -83,8 +83,23 @@ impl Scene {
         trace_opt
     }
 
-    pub fn visibility(&self, _ray: &Ray, _depth: f32) -> bool {
-        todo!()
+    pub fn test_line_intersect(&self, ray: &Ray, depth: f32) -> bool {
+        if self.prims.len() == 0 {
+            return false;
+        }
+        for (prim, _ind) in self.prims.iter() {
+            if prim.test_line_intersect(ray, depth) {
+                return true;
+            }
+        }
+        for light in self.lights.iter() {
+            if let Light::Area(al) = light {
+                if al.test_line_intersect(ray, depth) {
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     pub fn load_obj_file(&mut self, path: &Path) {

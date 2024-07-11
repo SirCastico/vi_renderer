@@ -15,11 +15,8 @@ use utils::{
 };
 
 use crate::{
-    lights::AreaLight,
-    primitives::triangle::Triangle,
-    render::IncrementalRenderer,
-    shaders::path_tracer_shader::PathTracerShader,
-    swapchain::DoubleBufferSwapChain,
+    lights::AreaLight, primitives::triangle::Triangle, render::IncrementalRenderer,
+    shaders::path_tracer_shader::PathTracerShader, swapchain::DoubleBufferSwapChain,
 };
 
 mod camera;
@@ -225,7 +222,7 @@ fn render_loop_with_swapchain<C, S>(
                 });
 
                 if !is_open {
-                    println!("[renderer] closed");
+                    println!("[renderer] swpchain closed");
                     break;
                 }
 
@@ -246,7 +243,7 @@ fn render_loop_with_swapchain<C, S>(
                 //print!("[event loop] upd: {} micros | ", upd_inst.elapsed().as_micros());
             });
             if !is_open {
-                println!("[event loop] closed");
+                println!("[event loop] swpchain closed");
                 window.update();
             }
             println!(
